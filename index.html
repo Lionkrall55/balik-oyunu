@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Canlı Deniz v0.2</title>
+    <title>DeepSea - Canlı Deniz v0.2.1</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -17,7 +17,6 @@
         .stats { display: flex; justify-content: space-around; font-size: 18px; font-weight: bold; }
         .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; background: radial-gradient(circle at center, #172a45 0%, #0a192f 100%); }
         
-        /* Gelişmiş Deniz Alanı Animasyonları */
         .sea-area { position: relative; width: 200px; height: 200px; display: flex; justify-content: center; align-items: center; }
         .water-ring {
             position: absolute; width: 100px; height: 100px; border: 4px solid #00f2fe; border-radius: 50%;
@@ -31,7 +30,6 @@
         .fisherman-emoji.fishing { animation: reel 1s infinite alternate; }
         @keyframes reel { 0% { transform: rotate(0deg); } 100% { transform: rotate(-15deg); } }
 
-        /* Balık Kartı Efekti */
         .fish-card {
             display: none; position: absolute; background: rgba(2, 12, 27, 0.95);
             border: 3px solid #00f2fe; border-radius: 20px; padding: 20px; width: 180px;
@@ -48,15 +46,15 @@
             background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #0a192f;
             border: none; padding: 18px 45px; font-size: 20px; font-weight: bold; border-radius: 50px;
             cursor: pointer; box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4); transition: all 0.2s;
+            z-index: 3;
         }
         .main-btn:active { transform: scale(0.95); box-shadow: 0 4px 10px rgba(0, 242, 254, 0.2); }
         .main-btn:disabled { background: #334155; color: #64748b; box-shadow: none; cursor: not-allowed; }
         
-        /* Alt sekmeler */
-        .nav-tabs { display: flex; background: rgba(2, 12, 27, 0.9); border-top: 2px solid #1e293b; }
+        .nav-tabs { display: flex; background: rgba(2, 12, 27, 0.9); border-top: 2px solid #1e293b; z-index: 10; }
         .tab-btn { flex: 1; background: none; border: none; color: #64748b; padding: 16px 0; font-size: 14px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
         .tab-btn.active { color: #00f2fe; background: linear-gradient(0deg, rgba(0,242,254,0.08) 0%, rgba(0,0,0,0) 100%); }
-        .menu-view { display: none; width: 90%; max-height: 55vh; overflow-y: auto; background: rgba(2, 12, 27, 0.98); border: 2px solid #1e293b; border-radius: 20px; padding: 15px; position: absolute; bottom: 85px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 4; }
+        .menu-view { display: none; width: 90%; max-height: 55vh; overflow-y: auto; background: rgba(2, 12, 27, 0.98); border: 2px solid #1e293b; border-radius: 20px; padding: 15px; position: absolute; bottom: 85px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 8; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #1e293b; }
         .buy-btn { background: #00f2fe; border: none; padding: 8px 16px; color: #020c1b; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
@@ -73,12 +71,10 @@
     </div>
 
     <div class="game-screen">
-        <!-- Hareketli Deniz Alanı -->
         <div class="sea-area">
             <div id="ripple-effect" class="water-ring"></div>
             <div id="game-char" class="fisherman-emoji">🧍‍♂️</div>
             
-            <!-- Sürpriz Balık Kartı -->
             <div id="fish-popup" class="fish-card" onclick="closeCard()">
                 <div id="card-rarity" style="font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">YAYGIN</div>
                 <div id="card-icon" style="font-size:55px; margin:10px 0;">🐟</div>
@@ -89,22 +85,22 @@
         </div>
 
         <div id="status-msg" class="status-text">Derin deniz seni bekliyor, olta at!</div>
-        <button id="action-btn" class="main-btn" onclick="startFishing()">🎣 OLTA AT</button>
+        <button id="action-btn" class="main-btn" onclick="startFishing()"> Olta At</button>
 
         <!-- Mağaza -->
         <div id="shop-menu" class="menu-view">
             <h3 style="color:#00f2fe; margin-top:0;">🛒 Ekipman Mağazası</h3>
             <div class="shop-item">
                 <div><strong>Ahşap Olta</strong><br><small style="color:#64748b;">Süre: 7sn | Şans: +%10</small></div>
-                <button id="btn-rod-1" class="buy-btn" onclick="buyRod('Ahşap Olta', 500)">500 🪙</button>
+                <button class="buy-btn" onclick="buyRod('Ahşap Olta', 500)">500 🪙</button>
             </div>
             <div class="shop-item">
                 <div><strong>Karbon Olta</strong><br><small style="color:#64748b;">Süre: 4sn | Şans: +%25</small></div>
-                <button id="btn-rod-2" class="buy-btn" onclick="buyRod('Karbon Olta', 2000)">2000 🪙</button>
+                <button class="buy-btn" onclick="buyRod('Karbon Olta', 2000)">2000 🪙</button>
             </div>
         </div>
 
-        <!-- Kova (Envanter) -->
+        <!-- Kova -->
         <div id="inventory-menu" class="menu-view">
             <h3 style="color:#00f2fe; margin-top:0;">🎒 Balık Kovası</h3>
             <div id="inv-list" style="margin-bottom: 15px;">Kovan boş, henüz denizden bir şey çıkmadı.</div>
@@ -113,7 +109,7 @@
     </div>
 
     <div class="nav-tabs">
-        <button id="tab-fish" class="tab-btn active" onclick="switchTab('fish')">🎣 Avlan</button>
+        <button id="tab-fish" class="tab-btn active" onclick="switchTab('fish')"> Avlan</button>
         <button id="tab-shop" class="tab-btn" onclick="switchTab('shop')">🛒 Market</button>
         <button id="tab-inv" class="tab-btn" onclick="switchTab('inv')">🎒 Kova</button>
     </div>
@@ -138,7 +134,7 @@
     };
 
     let player = {
-        username: tg.initDataUnsafe?.user?.username || "Balikci_Kral",
+        username: tg.initDataUnsafe?.user?.username || "Gezgin_Balikci",
         gold: 100, xp: 0, level: 1, current_rod: "Bambu Olta", inventory: {}
     };
 
@@ -149,6 +145,15 @@
     function saveGame() {
         localStorage.setItem('deepsea_save', JSON.stringify(player));
         updateUI();
+    }
+
+    function showTelegramAlert(msg) {
+        if (tg.showAlert) {
+            tg.showAlert(msg);
+        } else {
+            const status = document.getElementById('status-msg');
+            status.innerText = msg;
+        }
     }
 
     function updateUI() {
@@ -170,4 +175,3 @@
     }
 
     function switchTab(tab) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
