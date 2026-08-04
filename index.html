@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Resmi Telegram Sürümü v0.7.5</title>
+    <title>DeepSea - Telegram Onaylı v0.7.7</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -16,7 +16,6 @@
         .stats { display: flex; justify-content: space-around; align-items: center; font-size: 13px; font-weight: bold; }
         .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         
-        /* 🪙 Ortasında Çapa Olan Özel Madeni Para Logosu */
         .deep-coin-icon {
             display: inline-block; width: 16px; height: 16px; border: 2px solid #00f2fe;
             border-radius: 50%; background: #010814; color: #00f2fe; font-size: 11px;
@@ -33,7 +32,6 @@
         @keyframes waveSway { 0% { transform: translateY(5px); } 100% { transform: translateY(-5px); } }
 
         .storm-banner { display: none; background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%); color: white; width: 100%; padding: 6px 0; font-size: 12px; font-weight: bold; position: absolute; top: 0; z-index: 5; animation: blink 1s infinite alternate; }
-        @keyframes blink { 0% { opacity: 0.7; } 100% { opacity: 1; } }
 
         .sea-area { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; z-index: 2; }
         .fisherman-avatar { 
@@ -49,10 +47,8 @@
         .fish-card {
             display: none; position: absolute; background: rgba(1, 8, 20, 0.98);
             border: 2px solid #00f2fe; border-radius: 20px; padding: 15px; width: 190px;
-            box-shadow: 0 0 35px rgba(0,242,254,0.6); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 15;
-            text-align: center;
+            box-shadow: 0 0 35px rgba(0,242,254,0.6); z-index: 15; text-align: center;
         }
-        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .fish-icon-popup { font-size: 55px; margin: 10px 0; display: block; filter: drop-shadow(0 0 10px #00f2fe); }
 
         .status-text { font-size: 13px; margin: 6px; min-height: 20px; color: #94a3b8; font-weight: 500; z-index: 2; }
@@ -67,12 +63,6 @@
         .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #1e293b; font-size: 13px; }
         .buy-btn { background: #00f2fe; border: none; padding: 5px 12px; color: #010814; border-radius: 6px; font-weight: bold; font-size: 11px; }
         
-        .chart-box { background: #010814; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; margin-bottom: 12px; }
-        .candles { display: flex; justify-content: space-around; align-items: flex-end; height: 50px; margin-top: 5px; border-bottom: 1px solid #334155; }
-        .candle { width: 10px; border-radius: 1px; }
-        .candle.green { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
-        .candle.red { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
-
         .custom-alert {
             display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(1, 8, 20, 0.98); border: 2px solid #22c55e; border-radius: 15px;
@@ -83,7 +73,7 @@
 <body>
 
 <div id="alert-box" class="custom-alert">
-    <div style="font-size: 14px; font-weight: bold; color: #22c55e; margin-bottom: 10px;"> L LİMAN BİLDİRİMİ</div>
+    <div style="font-size: 14px; font-weight: bold; color: #22c55e; margin-bottom: 10px;">🏛️ LİMAN BİLDİRİMİ</div>
     <div id="alert-msg" style="font-size: 12px; color: white; margin-bottom: 15px;"></div>
     <button id="alert-close-btn" class="buy-btn" style="background: #22c55e; color: black; padding: 6px 20px;">ANLAŞILDI</button>
 </div>
@@ -121,23 +111,37 @@
         <!-- CANLI BORSA SEKLESİ -->
         <div id="trade-menu" class="menu-view">
             <h3 style="color:#22c55e; margin-top:0; border-bottom:2px solid #22c55e; padding-bottom:5px;">🏛️ DeepSea Canlı Balık Borsası</h3>
-            <div class="chart-box">
-                <div style="display:flex; justify-content:space-between; font-size:11px;">
-                    <strong>🦈 Levrek/GOLD Günlük Mum Grafiği</strong>
-                    <span style="color:#22c55e;">+%.45.2 (Boğa)</span>
-                </div>
-                <div class="candles">
-                    <div class="candle red" style="height: 20px;"></div>
-                    <div class="candle green" style="height: 40px;"></div>
-                    <div class="candle red" style="height: 10px;"></div>
-                    <div class="candle green" style="height: 48px;"></div>
-                </div>
-            </div>
             <div id="market-list"></div>
             <button id="sell-all-btn" class="main-btn" style="font-size:12px; padding:10px; width:100%; border-radius:12px; margin-top:10px;">💰 Tüm Balıkları Spotta Sat (%10 Liman Vergisi)</button>
         </div>
 
         <!-- KALKAN VE MARKET SEKLESİ -->
         <div id="shop-menu" class="menu-view">
-            <h3 style="color:#00f2fe; margin-top:0; border-bottom:2px solid #00f2fe; padding-bottom:5px;">🛒 Liman Mağazası & Kalkan Pazarı</h3>
-            <h4 style="margin:5px 0; color:#cbd5e1;">🛡️ Kalkan Depolama (PvP Koruma)</h4>
+            <h3 style="color:#00f2fe; margin-top:0; border-bottom:2px solid #00f2fe; padding-bottom:5px;">🛒 Liman Mağazası</h3>
+            <div class="shop-item">
+                <div><strong>Günlük Bedava Kalkan</strong></div>
+                <button id="free-shield-btn" class="buy-btn" style="background:#22c55e; color:white;">4 Saat Aç 🛡️</button>
+            </div>
+            <div class="shop-item">
+                <div><strong>Kaptan Başlangıç Paketi (3$)</strong></div>
+                <button id="premium-s1-btn" class="buy-btn" style="background:#3b82f6; color:white;">50 ⭐</button>
+            </div>
+            <div id="rod-list"></div>
+        </div>
+
+        <div id="pvp-menu" class="menu-view">
+            <h3 style="color:#ef4444; margin-top:0; border-bottom:2px solid #ef4444; padding-bottom:5px;">⚔️ Liman Yağmalama</h3>
+            <button id="pvp-search-btn" class="main-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; width:100%; border-radius:12px; font-size:13px;">🕵️‍♂️ Sınırsız Liman Ara (Maliyet: 10 Coin)</button>
+            <div id="pvp-result" style="margin-top:10px; font-size:12px; color:#eab308; font-weight:bold; text-align:center;"></div>
+        </div>
+
+        <div id="inventory-menu" class="menu-view">
+            <h3 style="color:#a855f7; margin-top:0; border-bottom:2px solid #a855f7; padding-bottom:5px;">🎒 Balık Kovası</h3>
+            <div id="inv-list">Kovan boş, henüz denizden bir şey çıkmadı.</div>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button id="tab-fish" class="tab-btn active">🎣 Avlan</button>
+        <button id="tab-trade" class="tab-btn">🏛️ Borsa</button>
+        <button id="tab-shop" class="tab-btn">🛒 Market</button>
