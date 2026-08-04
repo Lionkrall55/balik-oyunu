@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Crypto Club Edition v0.6.5</title>
+    <title>DeepSea - Crypto Club Ultimate v0.6.6</title>
     <style>
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,7 +12,6 @@
         }
         .container { display: flex; flex-direction: column; height: 100vh; justify-content: space-between; text-align: center; }
         .header { background: rgba(1, 8, 20, 0.9); padding: 10px; border-bottom: 2px solid #00f2fe; box-shadow: 0 4px 25px rgba(0,242,254,0.3); }
-        .user-info { font-size: 13px; color: #00f2fe; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; }
         .stats { display: flex; justify-content: space-around; font-size: 14px; font-weight: bold; }
         .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         
@@ -25,9 +24,6 @@
         @keyframes waveSway { 0% { transform: translateY(5px); } 100% { transform: translateY(-5px); } }
 
         .storm-banner { display: none; background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%); color: white; width: 100%; padding: 6px 0; font-size: 12px; font-weight: bold; position: absolute; top: 0; z-index: 5; animation: blink 1s infinite alternate; }
-        @keyframes blink { 0% { opacity: 0.7; } 100% { opacity: 1; } }
-
-        .sound-toggle { position: absolute; top: 40px; right: 15px; background: rgba(2, 12, 27, 0.7); border: 1px solid #00f2fe; color: #00f2fe; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; z-index: 6; }
 
         .sea-area { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; z-index: 2; }
         .fisherman-avatar { 
@@ -70,27 +66,19 @@
 </head>
 <body>
 
-<!-- 🎵 Crypto Club Duvarını Delen Bağımsız Ses Dosyaları -->
-<audio id="snd-cast" src="https://freewavesamples.com" preload="auto"></audio>
-<audio id="snd-catch" src="https://freewavesamples.com" preload="auto"></audio>
-<audio id="snd-cash" src="https://freewavesamples.com" preload="auto"></audio>
-
 <div class="container">
     <div class="header">
-        <div class="user-info">⚓ CLUBCRAFT KAPTAN: @Gezgin_Balikci</div>
+        <div class="user-info">⚓ CLUBCRAFT KAPTAN: MİLYONER BALIKÇI</div>
         <div class="stats">
-            <div>🪙 Deep Coin: <span id="gold-display">100</span></div>
+            <div>⚓ Deep Coin: <span id="gold-display">100</span></div>
             <div>🌟 Lv.<span id="level-display">1</span></div>
             <div style="color:#eab308;">⭐ ÇARPAN: <span id="x-display">1.0</span>X</div>
         </div>
     </div>
 
     <div class="game-screen">
-        <div id="storm-alert" class="storm-banner">⛈️ DENİZDE KIYAMET KOPTI! (ŞANS ALGORİTMİK DEĞİŞTİ) ⛈️</div>
-        
+        <div id="storm-alert" class="storm-banner">⛈️ DENİZDE KIYAMET KOPTI! ⛈️</div>
         <div class="ocean-waves"></div>
-        
-        <button id="sound-btn" class="sound-toggle" onclick="toggleSound(event)">🔊 SES: AÇIK</button>
         <div style="font-size: 11px; color:#64748b; margin-bottom:5px; z-index:2;">🛡️ Kalkan Durumu: <span id="shield-status" style="color:#ef4444; font-weight:bold;">KORUMASIZ 🚨</span></div>
         
         <div class="sea-area">
@@ -136,3 +124,15 @@
                 <button class="buy-btn" style="background:#22c55e; color:white;" onclick="activateFreeShield()">4 Saat Aç 🛡️</button>
             </div>
             <div class="shop-item" style="background:rgba(234,179,8,0.03); border:1px dashed #eab308; border-radius:8px; padding:8px;">
+                <div><strong style="color:#eab308;">📺 Reklam İzle (Kızışma Ayarı)</strong><br><small style="color:#94a3b8;">Tam 10 video izle, 1 saat kalkan kazan!</small></div>
+                <button class="buy-btn" style="background:#eab308; color:#010814;" onclick="watch10Ads()">10 İzle 📺</button>
+            </div>
+            
+            <h4 style="margin:10px 0 5px 0; color:#cbd5e1;">📦 Premium Paketler (Stars)</h4>
+            <div class="shop-item">
+                <div><strong>Kaptan Başlangıç Paketi</strong><br><small style="color:#94a3b8;">12sa Kalkan + 1.000 Coin + 2 Yem</small></div>
+                <button class="buy-btn" style="background:#3b82f6; color:white;" onclick="buyPremiumShield(12)">50 ⭐</button>
+            </div>
+            
+            <h4 style="margin:15px 0 5px 0; color:#cbd5e1;">🚤 Balıkçı Tekneleri (Yeni Bölgeler)</h4>
+            <div class="shop-item">
