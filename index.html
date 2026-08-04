@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Cyber Market Maker v0.9.9</title>
-    <!-- 🎯 Kesin ve Donmayan Telegram Kütüphanesi -->
+    <title>DeepSea - Cyber Market Maker v0.9.9 Full Final</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { 
@@ -14,17 +13,14 @@
         }
         .container { display: flex; flex-direction: column; height: 100vh; justify-content: space-between; text-align: center; }
         
-        /* 🌊 Elit Üst Panel Tasarımı */
         .header { background: rgba(1, 8, 20, 0.95); padding: 12px; border-bottom: 2px solid #00f2fe; box-shadow: 0 4px 25px rgba(0,242,254,0.3); position: relative; z-index: 20; }
         .user-info { font-size: 13px; color: #00f2fe; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; }
         .stats { display: flex; justify-content: space-around; font-size: 14px; font-weight: bold; align-items: center; }
         
-        /* 🌐 Üst Dil Seçim Alanı */
         .lang-bar { position: absolute; top: 12px; right: 12px; background: rgba(1, 8, 20, 0.8); border: 1px solid #00f2fe; border-radius: 6px; color: #00f2fe; font-size: 11px; padding: 2px 6px; cursor: pointer; font-weight: bold; }
 
         .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         
-        /* 🪙 Ortasında Çapa Olan Altın Sarısı Özel Madeni Para Logosu */
         .deep-coin-icon { 
             display: inline-block; width: 18px; height: 18px; border: 2px solid #eab308; 
             border-radius: 50%; color: #eab308; font-size: 11px; line-height: 16px; 
@@ -32,16 +28,6 @@
             vertical-align: middle; background: #010814;
         }
         
-        /* 🌊 Canlı Dalgalanan CSS Okyanus Efekti */
-        .ocean-waves { 
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; 
-            background: linear-gradient(180deg, rgba(0,242,254,0.08) 0%, rgba(2,31,56,0.6) 100%); 
-            border-top: 2px dashed rgba(0,242,254,0.4); 
-            animation: waveSway 4s infinite ease-in-out alternate; z-index: 1;
-        }
-        @keyframes waveSway { 0% { transform: translateY(6px); } 100% { transform: translateY(-6px); } }
-
-        /* ⚓ Animasyonlu Balıkçı Kaptan Silueti */
         .sea-area { position: relative; width: 160px; height: 160px; display: flex; justify-content: center; align-items: center; z-index: 2; }
         .fisherman-avatar { 
             width: 120px; height: 120px; border-radius: 50%; border: 3px solid #00f2fe; 
@@ -53,7 +39,6 @@
         @keyframes boatSway { 0%, 100% { transform: rotate(-8deg) scale(0.95); } 50% { transform: rotate(8deg) scale(1.05); } }
         .avatar-title { font-size: 11px; color: #00f2fe; font-weight: bold; margin-top: 2px; text-shadow: 0 0 5px #00f2fe; }
         
-        /* 🦈 Sinematik Av Kartı Pop-up */
         .fish-card { 
             display: none; position: absolute; background: rgba(1, 8, 20, 0.98); 
             border: 2px solid #00f2fe; border-radius: 20px; padding: 18px; width: 200px; 
@@ -65,27 +50,22 @@
         
         .status-text { font-size: 13px; margin: 8px; color: #94a3b8; font-weight: 500; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        /* ⚡ Sadece Av Sekmesinde Görünecek Neon Buton */
         .main-btn { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #010814; border: none; padding: 14px 40px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 25px rgba(0, 242, 254, 0.4); z-index: 10; transition: transform 0.1s; }
         .main-btn:disabled { background: #1e293b; color: #475569; box-shadow: none; pointer-events: none; }
         
-        /* 🎯 Mükemmel Çözüm: En Alt Kısma Sabitlenen Şeffaf Web3 Navigasyon Menüsü */
         .nav-tabs { display: flex; background: rgba(1, 8, 20, 0.98); border-top: 1px solid #1e293b; z-index: 30; position: relative; }
         .tab-btn { flex: 1; background: none; border: none; color: #475569; padding: 16px 0; font-size: 13px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
         .tab-btn.active { color: #00f2fe; background: linear-gradient(0deg, rgba(0,242,254,0.05) 0%, rgba(0,0,0,0) 100%); border-top: 2px solid #00f2fe; text-shadow: 0 0 8px #00f2fe; }
         
-        /* Pop-up Menü Görünümleri */
         .menu-view { display: none; width: 90%; max-height: 52vh; overflow-y: auto; background: rgba(1, 8, 20, 0.98); border: 1px solid #1e293b; border-radius: 20px; padding: 18px; position: absolute; bottom: 75px; z-index: 8; text-align: left; box-shadow: 0 -10px 35px rgba(0,0,0,0.6); }
         .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #1e293b; font-size: 13px; }
         .buy-btn { background: #00f2fe; border: none; padding: 6px 14px; color: #010814; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
         
-        /* 📊 Binance / TradingView Tarzı Gerçek Mum Grafik Yapısı */
         .chart-box { background: #010814; border: 1px solid #1e293b; border-radius: 14px; padding: 12px; margin-bottom: 15px; }
         .candles { display: flex; justify-content: space-around; align-items: flex-end; height: 65px; margin-top: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; position: relative; }
         .candle { width: 14px; border-radius: 2px; position: relative; }
         .candle.green { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.5); }
         .candle.red { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
-        /* Gerçekçi Mum Fitilleri */
         .candle::before { content: ""; position: absolute; left: 6px; top: -8px; bottom: -8px; width: 2px; background: inherit; z-index: -1; }
         
         .custom-alert { display: none; position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); background: rgba(1, 8, 20, 0.99); border: 2px solid #22c55e; border-radius: 18px; padding: 18px; width: 240px; z-index: 100; box-shadow: 0 0 35px rgba(34,197,94,0.6); text-align: center; }
@@ -97,7 +77,6 @@
 </head>
 <body>
 
-<!-- 🌐 Dil Seçim Barı -->
 <select id="lang-select" class="lang-bar" onchange="changeLanguage()">
     <option value="tr">🇹🇷 TR</option>
     <option value="en">🇺🇸 EN</option>
@@ -108,10 +87,9 @@
 <div id="alert-box" class="custom-alert">
     <div style="font-size:15px; font-weight:bold; color:#22c55e; margin-bottom:10px;">🏛️ LİMAN BİLDİRİMİ</div>
     <div id="alert-msg" style="font-size:13px; margin-bottom:18px; line-height:1.4;"></div>
-    <button id="alert-close-btn" class="buy-btn" style="background:#22c55e; color:black; padding:8px 25px;">ANLAŞILDI</button>
+    <button id="alert-close-btn" class="buy-btn" style="background:#22c55e; color:black; padding:8px 25px;" onclick="document.getElementById('alert-box').style.display='none'">ANLAŞILDI</button>
 </div>
 
-<!-- ✍️ Profil Düzenleme Penceresi -->
 <div id="profile-box" class="profile-popup">
     <div style="font-size:16px; font-weight:bold; color:#00f2fe; margin-bottom:12px;">✍️ PROFİLİNİ DÜZENLE</div>
     <div style="font-size:11px; color:#cbd5e1; margin-bottom:8px; text-align:left;">Kaptan Adı Girin:</div>
@@ -129,7 +107,6 @@
 </div>
 
 <div class="container">
-    <!-- Üst Bilgi Paneli -->
     <div class="header">
         <div id="username-display" class="user-info" onclick="openProfilePopup()">⚓ KAPTAN: @Gezgin_Balikci ✍️</div>
         <div class="stats">
@@ -140,9 +117,7 @@
         </div>
     </div>
 
-    <!-- Oyun Alanı -->
     <div class="game-screen">
-        <!-- ⛈️ Fırtına Banner -->
         <div id="storm-alert" style="display:none; position:absolute; top:10px; background:rgba(239,68,68,0.9); border:1px solid #ef4444; color:white; padding:8px 15px; border-radius:10px; font-size:12px; font-weight:bold; z-index:25; box-shadow:0 0 20px rgba(239,68,68,0.7);"></div>
 
         <div class="sea-area">
@@ -152,7 +127,6 @@
             </div>
         </div>
 
-        <!-- 🦈 Sinematik Av Yakalandı Pop-up Kartı -->
         <div id="fish-popup" class="fish-card">
             <div style="font-size:12px; color:#00f2fe; font-weight:bold;">🎯 AV YAKALANDI!</div>
             <span id="popup-fish-icon" class="fish-icon-popup">🐟</span>
@@ -163,7 +137,6 @@
 
         <div id="status-msg" class="status-text">Okyanus dalgalanıyor... Nadir av şansı anlık %12.4 arttı!</div>
 
-        <!-- 🏛️ Borsa Sekmesi Menüsü -->
         <div id="trade-menu" class="menu-view">
             <h3 id="chart-title" style="margin:0 0 10px 0; color:#00f2fe; font-size:15px;">🦈 Sardalya/GOLD Spot Grafik</h3>
             <div class="chart-box">
@@ -182,27 +155,22 @@
             <div id="market-list"></div>
         </div>
 
-        <!-- 🛒 Market Sekmesi Menüsü -->
         <div id="shop-menu" class="menu-view">
             <div id="rod-list"></div>
         </div>
 
-        <!-- ⚔️ PvP Liman Yağması Menüsü -->
         <div id="pvp-menu" class="menu-view">
             <h3 style="margin:0 0 10px 0; color:#ef4444; font-size:15px;">⚔️ Liman Yağması & İntikam</h3>
             <div id="pvp-result"></div>
         </div>
 
-        <!-- 🎒 Kova Sekmesi Menüsü -->
         <div id="inv-list" class="menu-view" style="font-size:13px; color:#cbd5e1; line-height:1.6;">
             Kovan boş, henüz denizden bir şey çıkmadı.
         </div>
 
-        <!-- Ana Eylem Butonu -->
         <button id="action-btn" class="main-btn" onclick="startFishing()">⚓ OLTAYI FIRLAT</button>
     </div>
 
-    <!-- Alt Web3 Navigasyon Barı -->
     <div class="nav-tabs">
         <button id="tab-fish" class="tab-btn active" onclick="switchTab('fish')">🎣 Avlan</button>
         <button id="tab-trade" class="tab-btn" onclick="switchTab('trade')">🏛️ Borsa</button>
@@ -216,21 +184,16 @@
     const tg = window.Telegram.WebApp; 
     try { tg.expand(); } catch(e) {}
     
-    // 🔊 Ses Altyapısı
     let isSoundMuted = false;
     function playSound(type) {
         if(isSoundMuted) return;
         try {
             let audio = new Audio();
-            if(type === 'cast') audio.src = 'https://freewavesamples.com';
-            if(type === 'catch') audio.src = 'https://freewavesamples.com';
-            if(type === 'cash') audio.src = 'https://freewavesamples.com';
             audio.volume = 0.15;
-            audio.play().catch(e => console.log("Ses engeli aşılırdı."));
+            audio.play().catch(e => {});
         } catch(e) {}
     }
 
-    // 🌐 Profesyonel Çoklu Dil Paneli Kelime Deposu (TR, EN, RU, DE)
     const LANGUAGES = {
         tr: { avlan: "🎣 Avlan", borsa: "🏛️ Borsa", market: "🛒 Market", pvp: "⚔️ PvP", kova: "🎒 Kova", olta_at: "⚓ OLTAYI FIRLAT", borsa_title: "🏛️ Canlı Balık Borsası", kovan_bos: "Kovan boş, henüz denizden bir şey çıkmadı.", anlasildi: "ANLAŞILDI" },
         en: { avlan: "🎣 Fish", borsa: "🏛️ Market", market: "🛒 Shop", pvp: "⚔️ PvP", kova: "🎒 Bucket", olta_at: "⚓ CAST LINE", borsa_title: "🏛️ Live Fish Exchange", kovan_bos: "Bucket is empty, nothing caught yet.", anlasildi: "CONFIRMED" },
@@ -239,7 +202,6 @@
     };
     let currentLang = "tr";
 
-    // 🦈 Genişletilmiş Okyanus Havuzu ve Market Maker Taban Fiyat Listesi
     const FISH_POOL = [
         { name: "Sardalya", chance: 40, basePrice: 10, xp: 5, icon: "🐟" }, 
         { name: "Hamsi", chance: 25, basePrice: 15, xp: 8, icon: "🐠" }, 
@@ -277,7 +239,7 @@
         document.getElementById('tab-shop').innerText = l.market;
         document.getElementById('tab-pvp').innerText = l.pvp;
         document.getElementById('tab-inv').innerText = l.kova;
-        document.getElementById('action-btn').innerText = l.oltayl_at || l.olda_at || "⚓ OLTAYI FIRLAT";
+        document.getElementById('action-btn').innerText = l.olta_at || "⚓ OLTAYI FIRLAT";
     }
 
     function selectLogo(logoElement, emoji) {
@@ -307,7 +269,6 @@
         }
     }
     
-    // 📊 Balinaların Hareketiyle Pump/Dump Yapan TradingView Grafik Motoru
     function changeChart(fishName) {
         selectedFish = fishName;
         let trendBox = document.getElementById('chart-trend');
@@ -370,7 +331,6 @@
         }); 
         document.getElementById('rod-list').innerHTML = html; 
 
-        // Statik Mağaza Dinleyicileri
         document.getElementById('buy-boat-1').onclick = function() { buyBoat('Ahşap Sandal', 0.50); };
         document.getElementById('buy-boat-2').onclick = function() { buyBoat('Sürat Motoru', 1.50); };
         document.getElementById('buy-boat-3').onclick = function() { buyBoat('Derin Deniz Gemisi', 3.00); };
@@ -491,7 +451,6 @@
         alert("⚔️ İntikam alındı, ganimetler kasaya eklendi!");
     }
 
-    // 🌊 Market Maker Mikro Volatilite Motoru (6 Saniyede Bir)
     setInterval(() => { 
         if(!isFishing) { 
             if(!isStormActive) {
@@ -506,7 +465,6 @@
         } 
     }, 6000);
 
-    // ⛈️ Canlı Fırtına Etkinliği Sistemi
     setInterval(() => {
         if(!isFishing && !isStormActive && Math.random() < 0.3) {
             isStormActive = true;
