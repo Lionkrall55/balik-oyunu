@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Crypto Club King v0.6.8</title>
+    <title>DeepSea - Crypto Club Instant v0.6.9</title>
     <style>
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: radial-gradient(circle at center, #021f38 0%, #010814 100%); color: white;
-            user-select: none; -webkit-user-select: none; overflow: hidden;
+            user-select: none; -webkit-select: none; overflow: hidden;
         }
         .container { display: flex; flex-direction: column; height: 100vh; justify-content: space-between; text-align: center; }
         .header { background: rgba(1, 8, 20, 0.9); padding: 10px; border-bottom: 2px solid #00f2fe; box-shadow: 0 4px 25px rgba(0,242,254,0.3); }
@@ -59,7 +59,6 @@
         .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #1e293b; font-size: 13px; }
         .buy-btn { background: #00f2fe; border: none; padding: 5px 12px; color: #010814; border-radius: 6px; font-weight: bold; font-size: 11px; }
 
-        /* 🚨 Crypto Club İçin Özel Güvenli Bildirim Kartı (Uygulamayı asla dondurmaz!) */
         .custom-alert {
             display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(1, 8, 20, 0.98); border: 2px solid #22c55e; border-radius: 15px;
@@ -69,9 +68,8 @@
 </head>
 <body>
 
-<!-- Özel Güvenli Bildirim Kartı -->
 <div id="alert-box" class="custom-alert">
-    <div style="font-size: 14px; font-weight: bold; color: #22c55e; margin-bottom: 10px;">🏛️ LİMAN BİLDİRİMİ</div>
+    <div style="font-size: 14px; font-weight: bold; color: #22c55e; margin-bottom: 10px;"> L LİMAN BİLDİRİMİ</div>
     <div id="alert-msg" style="font-size: 12px; color: white; margin-bottom: 15px;"></div>
     <button class="buy-btn" style="background: #22c55e; color: black; padding: 6px 20px;" onclick="closeAlert()">ANLAŞILDI</button>
 </div>
@@ -103,17 +101,11 @@
         </div>
 
         <div id="status-msg" class="status-text">Okyanusun derinlikleri seni bekliyor, olta at!</div>
-        <button id="action-btn" class="main-btn" onclick="startFishing()">⚓ OLTAYI FIRLAT</button>
+        <button id="action-btn" class="main-btn" onclick="startFishingInstant()">⚓ OLTAYI FIRLAT</button>
 
         <!-- CANLI BORSA SEKLESİ -->
         <div id="trade-menu" class="menu-view">
             <h3 style="color:#22c55e; margin-top:0; border-bottom:2px solid #22c55e; padding-bottom:5px;">🏛️ DeepSea Canlı Balık Borsası</h3>
-            <div class="chart-box">
-                <div style="display:flex; justify-content:space-between; font-size:11px;">
-                    <strong>🦈 Levrek/GOLD Günlük Mum Grafik</strong>
-                    <span style="color:#22c55e;">+%.45.2</span>
-                </div>
-            </div>
             <div id="market-list"></div>
             <button class="main-btn" style="font-size:12px; padding:10px; width:100%; border-radius:12px; margin-top:10px;" onclick="sellAllFish()">💰 Tüm Balıkları Spotta Sat (%10 Liman Vergisi)</button>
         </div>
@@ -128,10 +120,6 @@
             <div class="shop-item">
                 <div><strong>Kaptan Başlangıç Paketi (3$)</strong></div>
                 <button class="buy-btn" style="background:#3b82f6; color:white;" onclick="buyPremiumShield(12)">50 ⭐</button>
-            </div>
-            <div class="shop-item">
-                <div><strong>Ahşap Sandal (Nehir)</strong></div>
-                <button class="buy-btn" onclick="buyBoat('Ahşap Sandal')">50 ⭐</button>
             </div>
             <div id="rod-list"></div>
         </div>
@@ -149,6 +137,23 @@
     </div>
 
     <div class="nav-tabs">
-        <button id="tab-fish" class="tab-btn active" onclick="switchTab('fish')">🎣 Avlan</button>
+        <button id="tab-fish" class="tab-btn active" onclick="switchTab('fish')"> An Avlan</button>
         <button id="tab-trade" class="tab-btn" onclick="switchTab('trade')">🏛️ Borsa</button>
         <button id="tab-shop" class="tab-btn" onclick="switchTab('shop')">🛒 Market</button>
+        <button id="tab-pvp" class="tab-btn" style="color:#ef4444;" onclick="switchTab('pvp')">⚔️ PvP</button>
+        <button id="tab-inv" class="tab-btn" onclick="switchTab('inv')">🎒 Kova</button>
+    </div>
+</div>
+
+<script>
+    const FISH_POOL = [
+        { name: "Sardalya", chance: 50, basePrice: 10, xp: 5, icon: "🐟" },
+        { name: "Hamsi", chance: 40, basePrice: 15, xp: 8, icon: "🐠" },
+        { name: "Efsanevi Levrek", chance: 10, basePrice: 100, xp: 30, icon: "🦈" }
+    ];
+
+    const ROD_POOL = [
+        { name: "Ahşap Olta", price: 300 },
+        { name: "Titanyum Olta", price: 5000 }
+    ];
+
