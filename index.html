@@ -38,3 +38,130 @@ function updateUsername() {
 loadGame();
 updateUsername();
 updateUI();
+
+function startFishing() {
+    if (isFishing) return;
+
+    isFishing = true;
+
+    const btn = document.getElementById("action-btn");
+    btn.disabled = true;
+
+    let time = player.rodTime || 10;
+
+    document.getElementById("status-msg").innerText =
+        "🎣 Olta denize atıldı...";
+
+    btn.innerText = "⏳ " + time;
+
+    const timer = setInterval(() => {
+        time--;
+        btn.innerText = "⏳ " + time;
+
+        if (time <= 0) {
+            clearInterval(timer);
+            isFishing = false;
+            calculateCatch();
+        }
+    }, 1000);
+}
+
+function calculateCatch() {
+
+    let random = Math.random() * 100;
+
+    let total = 0;
+    let fish = FISH_POOL[0];
+
+    for (const f of FISH_POOL) {
+        total += f.chance;
+        if (random <= total) {
+            fish = f;
+            break;
+        }
+    }
+
+    player.inventory[fish.name] =
+        (player.inventory[fish.name] || 0) + 1;
+
+    player.xp += fish.xp;
+    player.level = Math.floor(player.xp / 100) + 1;
+    player.multiplier += 0.01;
+
+    document.getElementById("card-icon").innerText = fish.icon;
+    document.getElementById("card-name").innerText = fish.name;
+    document.getElementById("card-reward").innerText =
+        "+" + fish.xp + " XP";
+
+    document.getElementById("fish-popup").style.display = "block";
+
+    document.getElementById("action-btn").disabled = false;
+    document.getElementById("action-btn").innerText =
+        "⚓ OLTAYI FIRLAT";
+
+    saveGame();
+    updateUI();
+}
+
+function closeCard() {
+    document.getElementById("fish-popup").style.display = "none";
+}
+function switchTab(tab) {
+
+    document.querySelectorAll(".menu-view").forEach(menu => {
+        menu.style.display = "none";
+    });
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    const activeButton = document.getElementById("tab-" + tab);
+    if (activeButton) activeButton.classList.add("active");
+
+    if (tab === "fish") {
+        document.getElementById("fish-popup").style.display = "none";
+        return;
+    }
+
+    const menu = document.getElementById(tab + "-menu");
+    if (menu) {
+        menu.style.display = "block";
+    }
+
+    if (tab === "trade") {
+        updateBorsaUI();
+    }
+
+    if (tab === "shop") {
+        updateRodUI();
+    }
+
+    updateUI();
+}
+
+function activateFreeShield() {
+
+    if (player.freeShieldUsed) {
+        showAlert("Bugünkü ücretsiz kalkanını kullandın.");
+        return;
+    }
+
+    player.freeShieldUsed = true;
+    player.shieldTime = 4;
+
+    saveGame();
+    updateUI();
+
+    showAlert("🛡️ 4 saatlik kalkan aktif!");
+}
+
+function buyPremiumShield(hours) {
+
+    player.shieldTime += hours;
+
+    saveGame();
+    updateUI();
+
+    showAlert("⭐ Premium kalkan aktif.");
+}
