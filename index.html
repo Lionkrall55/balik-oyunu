@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Sinematik Canlı Borsa v0.5.9</title>
+    <title>DeepSea - Kesin Sürüm v0.6.0</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -17,7 +17,6 @@
         .stats { display: flex; justify-content: space-around; font-size: 14px; font-weight: bold; }
         .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         
-        /* 🌊 Garantili CSS Canlı Okyanus Dalgası Efekti (Dış Link Bağımlılığı Yok!) */
         .ocean-waves {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 35%;
             background: linear-gradient(180deg, rgba(0,242,254,0.05) 0%, rgba(2,31,56,0.4) 100%);
@@ -31,7 +30,6 @@
 
         .sound-toggle { position: absolute; top: 40px; right: 15px; background: rgba(2, 12, 27, 0.7); border: 1px solid #00f2fe; color: #00f2fe; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; z-index: 6; }
 
-        /* ⚓ Garantili Donmayan Kaptan Alanı */
         .sea-area { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; z-index: 2; }
         .fisherman-avatar { 
             width: 110px; height: 110px; border-radius: 50%; border: 3px solid #00f2fe; 
@@ -43,7 +41,6 @@
         @keyframes boatSway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
         .avatar-title { font-size: 11px; color: #00f2fe; font-weight: bold; margin-top: 2px; text-shadow: 0 0 5px #00f2fe; }
 
-        /* 🦈 Sinematik Hilesiz Balık Kartı */
         .fish-card {
             display: none; position: absolute; background: rgba(1, 8, 20, 0.98);
             border: 2px solid #00f2fe; border-radius: 20px; padding: 15px; width: 190px;
@@ -55,7 +52,6 @@
 
         .status-text { font-size: 13px; margin: 6px; min-height: 20px; color: #94a3b8; font-weight: 500; z-index: 2; }
         .main-btn { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #010814; border: none; padding: 12px 35px; font-size: 15px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 25px rgba(0, 242, 254, 0.4); z-index: 3; transition: all 0.2s; }
-        .main-btn:active { transform: scale(0.95); box-shadow: none; }
         .main-btn:disabled { background: #1e293b; color: #475569; box-shadow: none; }
         
         .nav-tabs { display: flex; background: rgba(1, 8, 20, 0.95); border-top: 1px solid #1e293b; z-index: 10; }
@@ -67,13 +63,13 @@
         .buy-btn { background: #00f2fe; border: none; padding: 5px 12px; color: #010814; border-radius: 6px; font-weight: bold; font-size: 11px; }
         
         .chart-box { background: #010814; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; margin-bottom: 12px; }
-        .candles { display: flex; justify-content: space-around; align-items: flex-end; height: 50px; margin-top: 5px; border-bottom: 1px solid #1e293b; }
+        .candles { display: flex; justify-content: space-around; align-items: flex-end; height: 50px; margin-top: 5px; border-bottom: 1px solid #334155; }
         .candle { width: 10px; border-radius: 1px; }
         .candle.green { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
         .candle.red { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
     </style>
 </head>
-<body>
+<body onclick="initAudioOnTouch()">
 
 <div class="container">
     <div class="header">
@@ -88,14 +84,12 @@
     <div class="game-screen">
         <div id="storm-alert" class="storm-banner">⛈️ DENİZDE KIYAMET KOPTI! (ŞANS ALGORİTMİK DEĞİŞTİ) ⛈️</div>
         
-        <!-- Canlı Dalga Efekti -->
         <div class="ocean-waves"></div>
         
-        <button id="sound-btn" class="sound-toggle" onclick="toggleSound()">🔊 SES: AÇIK</button>
+        <button id="sound-btn" class="sound-toggle" onclick="toggleSound(event)">🔊 SES: AÇIK</button>
         <div style="font-size: 11px; color:#64748b; margin-bottom:5px; z-index:2;">🛡️ Kalkan Durumu: <span id="shield-status" style="color:#ef4444; font-weight:bold;">KORUMASIZ 🚨</span></div>
         
         <div class="sea-area">
-            <!-- 🛡️ Kurşun Geçirmez Kaptan Alanı (Asla donmaz!) -->
             <div id="game-char" class="fisherman-avatar">
                 ⚓
                 <span class="avatar-title">KAPTAN</span>
@@ -140,3 +134,5 @@
                 <div><strong>Günlük Bedava Kalkan</strong><br><small style="color:#475569;">Günde 1 kez kullanılabilir.</small></div>
                 <button class="buy-btn" style="background:#22c55e; color:white;" onclick="activateFreeShield()">4 Saat Aç 🛡️</button>
             </div>
+            <div class="shop-item" style="background:rgba(234,179,8,0.03); border:1px dashed #eab308; border-radius:8px; padding:8px;">
+                <div><strong style="color:#eab308;">📺 Reklam İzle (Kızışma Ayarı)</strong><br><small style="color:#94a3b8;">Tam 10 video izle, 1 saat kalkan kazan!</small></div>
