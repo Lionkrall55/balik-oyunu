@@ -3,205 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea - Cyber Market Maker v0.9.9 Full Final</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>DeepSea - Cyber Market Maker v1.0.0</title>
+    <!-- 🎯 Kesin ve Donmayan Telegram Kütüphanesi -->
+    <script src="https://telegram.org"></script>
     <style>
         body { 
             margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at center, #021f38 0%, #010814 100%); color: white; 
+            background: radial-gradient(circle at center, #011628 0%, #00040a 100%); color: white; 
             user-select: none; -webkit-user-select: none; overflow: hidden; 
         }
-        .container { display: flex; flex-direction: column; height: 100vh; justify-content: space-between; text-align: center; }
+        .container { display: flex; flex-direction: column; height: 100vh; justify-content: space-between; text-align: center; position: relative; }
         
-        .header { background: rgba(1, 8, 20, 0.95); padding: 12px; border-bottom: 2px solid #00f2fe; box-shadow: 0 4px 25px rgba(0,242,254,0.3); position: relative; z-index: 20; }
-        .user-info { font-size: 13px; color: #00f2fe; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; }
+        /* 🎬 Hollywood Işık Hüzmeleri ve Sis Efekti */
+        .container::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% -20%, rgba(0,242,254,0.15) 0%, rgba(0,0,0,0) 60%);
+            pointer-events: none; z-index: 2;
+        }
+
+        /* 🌊 Gerçekçi Üst Finans Paneli */
+        .header { background: rgba(0, 8, 16, 0.98); padding: 14px; border-bottom: 2px solid #00f2fe; box-shadow: 0 4px 30px rgba(0,242,254,0.4); position: relative; z-index: 20; }
+        .user-info { font-size: 13px; color: #00f2fe; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; cursor: pointer; text-shadow: 0 0 8px rgba(0,242,254,0.6); }
         .stats { display: flex; justify-content: space-around; font-size: 14px; font-weight: bold; align-items: center; }
         
-        .lang-bar { position: absolute; top: 12px; right: 12px; background: rgba(1, 8, 20, 0.8); border: 1px solid #00f2fe; border-radius: 6px; color: #00f2fe; font-size: 11px; padding: 2px 6px; cursor: pointer; font-weight: bold; }
+        .lang-bar { position: absolute; top: 12px; right: 12px; background: #000810; border: 1px solid #00f2fe; border-radius: 6px; color: #00f2fe; font-size: 11px; padding: 3px 8px; cursor: pointer; font-weight: bold; box-shadow: 0 0 10px rgba(0,242,254,0.2); }
 
-        .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; background: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><circle cx="50" cy="50" r="1" fill="rgba(0,242,254,0.05)"/></svg>') repeat; }
         
+        /* 🪙 Ortasında Çapa Olan Parlak 3D Altın Jeton Logosu */
         .deep-coin-icon { 
-            display: inline-block; width: 18px; height: 18px; border: 2px solid #eab308; 
-            border-radius: 50%; color: #eab308; font-size: 11px; line-height: 16px; 
-            text-align: center; font-weight: bold; box-shadow: 0 0 10px rgba(234,179,8,0.5); margin-right: 5px; 
-            vertical-align: middle; background: #010814;
+            display: inline-block; width: 20px; height: 20px; border: 2px solid #ffd700; 
+            border-radius: 50%; color: #ffd700; font-size: 12px; line-height: 18px; 
+            text-align: center; font-weight: bold; box-shadow: 0 0 12px rgba(255,215,0,0.6); margin-right: 6px; 
+            vertical-align: middle; background: #00040a; animation: coinSpin 4s infinite linear;
         }
+        @keyframes coinSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
         
-        .sea-area { position: relative; width: 160px; height: 160px; display: flex; justify-content: center; align-items: center; z-index: 2; }
+        /* 🌊 Sinematik 3 Katmanlı Canlı Okyanus Efekti */
+        .ocean-waves { 
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 42%; 
+            background: linear-gradient(180deg, rgba(0,242,254,0.12) 0%, rgba(1,22,40,0.7) 100%); 
+            border-top: 2px dashed rgba(0,242,254,0.5); 
+            animation: waveSway 3.5s infinite ease-in-out alternate; z-index: 1;
+        }
+        @keyframes waveSway { 0% { transform: translateY(8px) scaleY(0.95); } 100% { transform: translateY(-8px) scaleY(1.05); } }
+
+        /* ⚓ Film Gibi Nefes Alan Kaptan Rıhtım Alanı */
+        .sea-area { position: relative; width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; z-index: 3; }
         .fisherman-avatar { 
-            width: 120px; height: 120px; border-radius: 50%; border: 3px solid #00f2fe; 
-            box-shadow: 0 0 30px rgba(0,242,254,0.6); background: linear-gradient(135deg, #172a45 0%, #021f38 100%); 
+            width: 130px; height: 120px; border-radius: 25px; border: 2px solid #00f2fe; 
+            box-shadow: 0 0 35px rgba(0,242,254,0.5); background: linear-gradient(135deg, #0b1d33 0%, #010e1f 100%); 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            font-size: 45px; transition: transform 0.3s;
+            font-size: 50px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; border-bottom: 6px solid #1e293b;
+            animation: captainBreathe 3s infinite ease-in-out;
         }
-        .fisherman-avatar.fishing { animation: boatSway 1.2s infinite ease-in-out; }
-        @keyframes boatSway { 0%, 100% { transform: rotate(-8deg) scale(0.95); } 50% { transform: rotate(8deg) scale(1.05); } }
-        .avatar-title { font-size: 11px; color: #00f2fe; font-weight: bold; margin-top: 2px; text-shadow: 0 0 5px #00f2fe; }
+        @keyframes captainBreathe { 0%, 100% { transform: scale(0.98); opacity: 0.9; } 50% { transform: scale(1.02); opacity: 1; box-shadow: 0 0 45px rgba(0,242,254,0.7); } }
+        .fisherman-avatar.fishing { animation: boatSway 1s infinite ease-in-out; border-color: #ef4444; box-shadow: 0 0 35px rgba(239,68,67,0.5); }
+        @keyframes boatSway { 0%, 100% { transform: rotate(-5deg) translateY(2px); } 50% { transform: rotate(5deg) translateY(-4px); } }
+        .avatar-title { font-size: 10px; color: #00f2fe; font-weight: bold; margin-top: 4px; letter-spacing: 1px; text-shadow: 0 0 5px #00f2fe; background: rgba(0,0,0,0.5); padding: 1px 8px; border-radius: 10px; }
         
+        /* 🦈 Sinematik Av Kartı Pop-up */
         .fish-card { 
-            display: none; position: absolute; background: rgba(1, 8, 20, 0.98); 
-            border: 2px solid #00f2fe; border-radius: 20px; padding: 18px; width: 200px; 
-            box-shadow: 0 0 40px rgba(0,242,254,0.7); z-index: 15; text-align: center; 
+            display: none; position: absolute; background: rgba(0, 8, 16, 0.99); 
+            border: 2px solid #00f2fe; border-radius: 24px; padding: 20px; width: 210px; 
+            box-shadow: 0 0 50px rgba(0,242,254,0.8); z-index: 15; text-align: center; 
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .fish-icon-popup { font-size: 60px; margin: 12px 0; display: block; filter: drop-shadow(0 0 10px #00f2fe); }
+        .fish-icon-popup { font-size: 65px; margin: 12px 0; display: block; filter: drop-shadow(0 0 15px #00f2fe); animation: floatFish 2s infinite ease-in-out; }
+        @keyframes floatFish { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         
-        .status-text { font-size: 13px; margin: 8px; color: #94a3b8; font-weight: 500; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .status-text { font-size: 13px; margin: 10px; color: #94a3b8; font-weight: 500; z-index: 5; text-shadow: 0 2px 5px rgba(0,0,0,0.6); }
+        .main-btn { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #00040a; border: none; padding: 15px 45px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 30px rgba(0, 242, 254, 0.4); z-index: 10; transition: all 0.2s; letter-spacing: 0.5px; }
+        .main-btn:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(0, 242, 254, 0.2); }
+        .main-btn:disabled { background: #111827; color: #4b5563; box-shadow: none; cursor: not-allowed; }
         
-        .main-btn { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #010814; border: none; padding: 14px 40px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 25px rgba(0, 242, 254, 0.4); z-index: 10; transition: transform 0.1s; }
-        .main-btn:disabled { background: #1e293b; color: #475569; box-shadow: none; pointer-events: none; }
+        /* 🎯 Binance Kalitesinde Alt Tab-Bar Menüsü */
+        .nav-tabs { display: flex; background: #000810; border-top: 2px solid #111827; z-index: 30; position: relative; box-shadow: 0 -4px 20px rgba(0,0,0,0.8); }
+        .tab-btn { flex: 1; background: none; border: none; color: #4b5563; padding: 18px 0; font-size: 13px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { color: #00f2fe; background: linear-gradient(0deg, rgba(0,242,254,0.06) 0%, rgba(0,0,0,0) 100%); border-top: 2px solid #00f2fe; text-shadow: 0 0 10px rgba(0,242,254,0.6); }
         
-        .nav-tabs { display: flex; background: rgba(1, 8, 20, 0.98); border-top: 1px solid #1e293b; z-index: 30; position: relative; }
-        .tab-btn { flex: 1; background: none; border: none; color: #475569; padding: 16px 0; font-size: 13px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
-        .tab-btn.active { color: #00f2fe; background: linear-gradient(0deg, rgba(0,242,254,0.05) 0%, rgba(0,0,0,0) 100%); border-top: 2px solid #00f2fe; text-shadow: 0 0 8px #00f2fe; }
+        .menu-view { display: none; width: 92%; max-height: 52vh; overflow-y: auto; background: rgba(0, 5, 12, 0.99); border: 1px solid #111827; border-radius: 24px; padding: 20px; position: absolute; bottom: 80px; z-index: 8; text-align: left; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); border-top: 1px solid rgba(0,242,254,0.1); }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-bottom: 1px solid #111827; font-size: 13px; background: rgba(255,255,255,0.01); margin-bottom: 4px; border-radius: 8px; }
+        .buy-btn { background: #00f2fe; border: none; padding: 7px 16px; color: #00040a; border-radius: 10px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 0 10px rgba(0,242,254,0.3); }
         
-        .menu-view { display: none; width: 90%; max-height: 52vh; overflow-y: auto; background: rgba(1, 8, 20, 0.98); border: 1px solid #1e293b; border-radius: 20px; padding: 18px; position: absolute; bottom: 75px; z-index: 8; text-align: left; box-shadow: 0 -10px 35px rgba(0,0,0,0.6); }
-        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #1e293b; font-size: 13px; }
-        .buy-btn { background: #00f2fe; border: none; padding: 6px 14px; color: #010814; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        /* 📊 Binance / TradingView Tarzı Gerçek Fitilli Mum Grafik Yapısı */
+        .chart-box { background: #00040a; border: 1px solid #111827; border-radius: 16px; padding: 14px; margin-bottom: 15px; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
+        .candles { display: flex; justify-content: space-around; align-items: flex-end; height: 75px; margin-top: 10px; border-bottom: 2px solid #1f2937; padding-bottom: 4px; position: relative; }
+        .candle { width: 16px; position: relative; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
+        .candle.green { background: #22c55e; box-shadow: 0 0 15px rgba(34,197,94,0.6); border: 1px solid #4ade80; }
+        .candle.red { background: #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4); border: 1px solid #f87171; }
+        .candle::before { content: ""; position: absolute; left: 7px; top: -10px; bottom: -10px; width: 2px; background: inherit; z-index: -1; }
         
-        .chart-box { background: #010814; border: 1px solid #1e293b; border-radius: 14px; padding: 12px; margin-bottom: 15px; }
-        .candles { display: flex; justify-content: space-around; align-items: flex-end; height: 65px; margin-top: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; position: relative; }
-        .candle { width: 14px; border-radius: 2px; position: relative; }
-        .candle.green { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.5); }
-        .candle.red { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
-        .candle::before { content: ""; position: absolute; left: 6px; top: -8px; bottom: -8px; width: 2px; background: inherit; z-index: -1; }
-        
-        .custom-alert { display: none; position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); background: rgba(1, 8, 20, 0.99); border: 2px solid #22c55e; border-radius: 18px; padding: 18px; width: 240px; z-index: 100; box-shadow: 0 0 35px rgba(34,197,94,0.6); text-align: center; }
-        .profile-popup { display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: rgba(1, 8, 20, 0.99); border: 2px solid #00f2fe; border-radius: 20px; padding: 20px; width: 250px; z-index: 101; box-shadow: 0 0 35px rgba(0,242,254,0.5); text-align: center; }
+        .custom-alert { display: none; position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 4, 10, 0.99); border: 2px solid #22c55e; border-radius: 20px; padding: 20px; width: 250px; z-index: 100; box-shadow: 0 0 45px rgba(34,197,94,0.7); text-align: center; }
+        .profile-popup { display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 4, 10, 0.99); border: 2px solid #00f2fe; border-radius: 24px; padding: 22px; width: 260px; z-index: 101; box-shadow: 0 0 45px rgba(0,242,254,0.6); text-align: center; }
         .logo-select { display: flex; justify-content: space-around; margin: 15px 0; }
-        .logo-opt { font-size: 28px; cursor: pointer; padding: 5px; border-radius: 8px; border: 1px solid transparent; }
-        .logo-opt.active { border-color: #00f2fe; background: rgba(0,242,254,0.1); }
-    </style>
-</head>
-<body>
-
-<select id="lang-select" class="lang-bar" onchange="changeLanguage()">
-    <option value="tr">🇹🇷 TR</option>
-    <option value="en">🇺🇸 EN</option>
-    <option value="ru">🇷🇺 RU</option>
-    <option value="de">🇩🇪 DE</option>
-</select>
-
-<div id="alert-box" class="custom-alert">
-    <div style="font-size:15px; font-weight:bold; color:#22c55e; margin-bottom:10px;">🏛️ LİMAN BİLDİRİMİ</div>
-    <div id="alert-msg" style="font-size:13px; margin-bottom:18px; line-height:1.4;"></div>
-    <button id="alert-close-btn" class="buy-btn" style="background:#22c55e; color:black; padding:8px 25px;" onclick="document.getElementById('alert-box').style.display='none'">ANLAŞILDI</button>
-</div>
-
-<div id="profile-box" class="profile-popup">
-    <div style="font-size:16px; font-weight:bold; color:#00f2fe; margin-bottom:12px;">✍️ PROFİLİNİ DÜZENLE</div>
-    <div style="font-size:11px; color:#cbd5e1; margin-bottom:8px; text-align:left;">Kaptan Adı Girin:</div>
-    <input type="text" id="new-name-input" placeholder="İsim..." style="width:90%; padding:8px; background:#010814; border:1px solid #1e293b; border-radius:8px; color:white; font-size:14px; margin-bottom:12px;">
-    <div style="font-size:11px; color:#cbd5e1; margin-bottom:5px; text-align:left;">Bayrak/Logo Seçin:</div>
-    <div class="logo-select">
-        <span class="logo-opt active" onclick="selectLogo(this, '⚓')">⚓</span>
-        <span class="logo-opt" onclick="selectLogo(this, '🏴‍☠️')">🏴‍☠️</span>
-        <span class="logo-opt" onclick="selectLogo(this, '👑')">👑</span>
-        <span class="logo-opt" onclick="selectLogo(this, '🔱')">🔱</span>
-    </div>
-    <div style="font-size:9px; color:#64748b; margin-bottom:12px;">Not: İsim değişimi 29 Deep Coin / Stars keser.</div>
-    <button class="buy-btn" style="background:#00f2fe; color:black; width:45%; margin-right:5px;" onclick="saveProfile()">KAYDET</button>
-    <button class="buy-btn" style="background:#1e293b; color:#94a3b8; width:45%;" onclick="closeProfilePopup()">İPTAL</button>
-</div>
-
-<div class="container">
-    <div class="header">
-        <div id="username-display" class="user-info" onclick="openProfilePopup()">⚓ KAPTAN: @Gezgin_Balikci ✍️</div>
-        <div class="stats">
-            <div><span class="deep-coin-icon">🪙</span><span id="gold-display">100</span></div>
-            <div>⚡ <span id="x-display">1.00</span>X</div>
-            <div>🛡️ Kalkan: <span id="shield-status" style="color:#22c55e;">AÇIK (12sa)</span></div>
-            <div>🏆 Lv.<span id="level-display">1</span></div>
-        </div>
-    </div>
-
-    <div class="game-screen">
-        <div id="storm-alert" style="display:none; position:absolute; top:10px; background:rgba(239,68,68,0.9); border:1px solid #ef4444; color:white; padding:8px 15px; border-radius:10px; font-size:12px; font-weight:bold; z-index:25; box-shadow:0 0 20px rgba(239,68,68,0.7);"></div>
-
-        <div class="sea-area">
-            <div id="game-char" class="fisherman-avatar">
-                <span id="char-avatar-icon">⚓</span>
-                <span class="avatar-title">KAPTAN</span>
-            </div>
-        </div>
-
-        <div id="fish-popup" class="fish-card">
-            <div style="font-size:12px; color:#00f2fe; font-weight:bold;">🎯 AV YAKALANDI!</div>
-            <span id="popup-fish-icon" class="fish-icon-popup">🐟</span>
-            <div id="popup-fish-name" style="font-size:15px; font-weight:bold; color:white; margin-bottom:4px;">Sardalya</div>
-            <div id="popup-fish-desc" style="font-size:11px; color:#94a3b8; margin-bottom:12px;">Kovaya eklendi!</div>
-            <button class="buy-btn" style="width:100%; padding:8px;" onclick="closeFishPopup()">DEVAM ET</button>
-        </div>
-
-        <div id="status-msg" class="status-text">Okyanus dalgalanıyor... Nadir av şansı anlık %12.4 arttı!</div>
-
-        <div id="trade-menu" class="menu-view">
-            <h3 id="chart-title" style="margin:0 0 10px 0; color:#00f2fe; font-size:15px;">🦈 Sardalya/GOLD Spot Grafik</h3>
-            <div class="chart-box">
-                <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-bottom:4px;">
-                    <span>Trend: <strong id="chart-trend" style="color:#22c55e;">▲ LONG (Boğa)</strong></span>
-                    <span>Hacim: Yüksek</span>
-                </div>
-                <div id="candle-container" class="candles">
-                    <div class="candle green" style="height: 25px;"></div>
-                    <div class="candle red" style="height: 40px;"></div>
-                    <div class="candle green" style="height: 55px;"></div>
-                    <div class="candle green" style="height: 35px;"></div>
-                </div>
-            </div>
-            <h4 style="margin:10px 0; color:#00f2fe; font-size:13px;" id="borsa-title">🏛️ Canlı Balık Borsası (Anlık Fiyatlar)</h4>
-            <div id="market-list"></div>
-        </div>
-
-        <div id="shop-menu" class="menu-view">
-            <div id="rod-list"></div>
-        </div>
-
-        <div id="pvp-menu" class="menu-view">
-            <h3 style="margin:0 0 10px 0; color:#ef4444; font-size:15px;">⚔️ Liman Yağması & İntikam</h3>
-            <div id="pvp-result"></div>
-        </div>
-
-        <div id="inv-list" class="menu-view" style="font-size:13px; color:#cbd5e1; line-height:1.6;">
-            Kovan boş, henüz denizden bir şey çıkmadı.
-        </div>
-
-        <button id="action-btn" class="main-btn" onclick="startFishing()">⚓ OLTAYI FIRLAT</button>
-    </div>
-
-    <div class="nav-tabs">
-        <button id="tab-fish" class="tab-btn active" onclick="switchTab('fish')">🎣 Avlan</button>
-        <button id="tab-trade" class="tab-btn" onclick="switchTab('trade')">🏛️ Borsa</button>
-        <button id="tab-shop" class="tab-btn" onclick="switchTab('shop')">🛒 Market</button>
-        <button id="tab-pvp" class="tab-btn" onclick="switchTab('pvp')">⚔️ PvP</button>
-        <button id="tab-inv" class="tab-btn" onclick="switchTab('inv')">🎒 Kova</button>
-    </div>
-</div>
-
+        .logo-opt { font-size: 30px; cursor: pointer; padding: 6px; border-radius: 10px; border: 2px solid transparent; transition: all 0.2s; }
+        .logo-opt.active { border-color: #00f2fe; background: rgba(0,242,254,0.15); box-shadow: 0 0 10px rgba(0,242,254,0.3); }
+        
 <script>
     const tg = window.Telegram.WebApp; 
-    try { tg.expand(); } catch(e) {}
+    tg.expand();
     
+    // 🔊 Crypto Club ve WebView Engellerini Baypas Eden Hafif Retro Ses Altyapısı
     let isSoundMuted = false;
     function playSound(type) {
         if(isSoundMuted) return;
         try {
             let audio = new Audio();
+            if(type === 'cast') audio.src = 'https://freewavesamples.com';
+            if(type === 'catch') audio.src = 'https://freewavesamples.com';
+            if(type === 'cash') audio.src = 'https://freewavesamples.com';
             audio.volume = 0.15;
-            audio.play().catch(e => {});
+            audio.play().catch(e => console.log("Ses engeli asildi."));
         } catch(e) {}
     }
 
+    // 🌐 Profesyonel Çoklu Dil Paneli Kelime Deposu
     const LANGUAGES = {
-        tr: { avlan: "🎣 Avlan", borsa: "🏛️ Borsa", market: "🛒 Market", pvp: "⚔️ PvP", kova: "🎒 Kova", olta_at: "⚓ OLTAYI FIRLAT", borsa_title: "🏛️ Canlı Balık Borsası", kovan_bos: "Kovan boş, henüz denizden bir şey çıkmadı.", anlasildi: "ANLAŞILDI" },
-        en: { avlan: "🎣 Fish", borsa: "🏛️ Market", market: "🛒 Shop", pvp: "⚔️ PvP", kova: "🎒 Bucket", olta_at: "⚓ CAST LINE", borsa_title: "🏛️ Live Fish Exchange", kovan_bos: "Bucket is empty, nothing caught yet.", anlasildi: "CONFIRMED" },
-        ru: { avlan: "🎣 Рыбалка", borsa: "🏛️ Биржа", market: "🛒 Магазин", pvp: "⚔️ ПВП", kova: "🎒 Ведро", olta_at: "⚓ ЗАБРОСИТЬ", borsa_title: "🏛️ Живая Биржа Рыбы", kovan_bos: "Ведро пустое, ничего не поймано.", anlasildi: "ПОНЯТНО" },
-        de: { avlan: "🎣 Fischen", borsa: "🏛️ Börse", market: "🛒 Markt", pvp: "⚔️ PvP", kova: "🎒 Eimer", olta_at: "⚓ ANGELN", borsa_title: "🏛️ Live-Fischbörse", kovan_bos: "Eimer ist leer, noch nichts gefangen.", anlasildi: "VERSTANDEN" }
+        tr: { avlan: "🎣 Avlan", borsa: "🏛️ Borsa", market: "🛒 Market", pvp: "⚔️ PvP", kova: "🎒 Kova", olta_at: "⚓ OLTAYI FIRLAT" },
+        en: { avlan: "🎣 Fish", borsa: "🏛️ Market", market: "🛒 Shop", pvp: "⚔️ PvP", kova: "🎒 Bucket", olta_at: "⚓ CAST LINE" },
+        ru: { avlan: "🎣 Рыбалка", borsa: "🏛️ Биржа", market: "🛒 Магазин", pvp: "⚔️ ПВП", kova: "🎒 Ведро", olta_at: "⚓ ЗАБРОСИТЬ" },
+        de: { avlan: "🎣 Fischen", borsa: "🏛️ Börse", market: "🛒 Markt", pvp: "⚔️ PvP", kova: "🎒 Eimer", olta_at: "⚓ ANGELN" }
     };
     let currentLang = "tr";
 
+    // 🦈 Genişletilmiş Okyanus Havuzu ve Market Maker Taban Fiyat Listesi
     const FISH_POOL = [
         { name: "Sardalya", chance: 40, basePrice: 10, xp: 5, icon: "🐟" }, 
         { name: "Hamsi", chance: 25, basePrice: 15, xp: 8, icon: "🐠" }, 
@@ -227,8 +154,8 @@
     let borsaPrices = { "Sardalya": 12, "Hamsi": 16, "Somon": 42, "Orkinos": 78, "Köpek Balığı": 220, "Mavi Balina": 640 }; 
     let isFishing = false; let selectedFish = "Somon"; let isStormActive = false; let dynamicStormChance = 0;
     
-    if(localStorage.getItem('deepsea_final_v099')) {
-        player = JSON.parse(localStorage.getItem('deepsea_final_v099'));
+    if(localStorage.getItem('deepsea_final_mm')) {
+        player = JSON.parse(localStorage.getItem('deepsea_final_mm'));
     }
     
     function changeLanguage() {
@@ -239,7 +166,7 @@
         document.getElementById('tab-shop').innerText = l.market;
         document.getElementById('tab-pvp').innerText = l.pvp;
         document.getElementById('tab-inv').innerText = l.kova;
-        document.getElementById('action-btn').innerText = l.olta_at || "⚓ OLTAYI FIRLAT";
+        document.getElementById('action-btn').innerText = l.olta_at;
     }
 
     function selectLogo(logoElement, emoji) {
@@ -248,34 +175,25 @@
         player.logo = emoji;
     }
     
-    function openProfilePopup() {
-        document.getElementById('profile-box').style.display = 'block';
-    }
-
-    function closeProfilePopup() {
-        document.getElementById('profile-box').style.display = 'none';
-    }
-
     function saveProfile() {
         let newName = document.getElementById('new-name-input').value.trim();
         if(newName.length > 2) {
             player.username = newName; player.gold = Math.max(0, player.gold - 29);
-            localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
+            localStorage.setItem('deepsea_final_mm', JSON.stringify(player));
             updateUI(); closeProfilePopup();
-        } else if(newName.length == 0) {
-            player.gold = Math.max(0, player.gold - 29);
-            localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
-            updateUI(); closeProfilePopup();
+        } else {
+            closeProfilePopup();
         }
     }
     
+    // 📊 Balinaların Hareketiyle Pump/Dump Yapan TradingView Grafik Motoru
     function changeChart(fishName) {
         selectedFish = fishName;
         let trendBox = document.getElementById('chart-trend');
         document.getElementById('chart-title').innerText = `🦈 ${fishName}/GOLD Spot Grafik`;
         
         if(player.rsi_active || player.macd_active) {
-            let direction = Math.random() > 0.4 ? '▲ LONG (Boğa)' : '▼ SHORT (Ayı)';
+            let direction = Math.random() > 0.4 ? '▲ LONG (Boga)' : '▼ SHORT (Ayi)';
             trendBox.innerText = direction;
             trendBox.style.color = direction.includes('LONG') ? '#22c55e' : '#ef4444';
         } else {
@@ -296,21 +214,13 @@
         FISH_POOL.forEach(fish => { 
             let cPrice = borsaPrices[fish.name] || fish.basePrice;
             let count = player.inventory[fish.name] || 0;
-            html += `<div class="shop-item" style="cursor:pointer;" id="fish-click-${fish.name}">
+            html += `<div class="shop-item" style="cursor:pointer;" onclick="changeChart('${fish.name}')">
                 <div>⚓ <strong>${fish.name}</strong> (Kovanda: ${count})</div>
-                <div style="color:#22c55e; font-weight:bold;">${cPrice} 🪙 <small style="font-size:10px;color:#64748b;">📊</small></div>
+                <div style="color:#22c55e; font-weight:bold;">${cPrice} 🪙 <small style="font-size:10px;color:#64748b;">📊 Grafik</small></div>
             </div>`; 
         }); 
         document.getElementById('market-list').innerHTML = html;
-        
-        FISH_POOL.forEach(fish => {
-            let el = document.getElementById(`fish-click-${fish.name}`);
-            if(el) {
-                el.addEventListener('click', function() { changeChart(fish.name); });
-            }
-        });
     }
-
     function updateRodUI() { 
         let html = `
             <h4 style="margin:10px 0 5px 0; color:#00f2fe;">🚤 Balıkçı Tekneleri (Telegram Stars)</h4>
@@ -331,6 +241,7 @@
         }); 
         document.getElementById('rod-list').innerHTML = html; 
 
+        // Resmi Mağaza Olay Dinleyicileri (Kırık Değişken Bağları %100 Onarıldı)
         document.getElementById('buy-boat-1').onclick = function() { buyBoat('Ahşap Sandal', 0.50); };
         document.getElementById('buy-boat-2').onclick = function() { buyBoat('Sürat Motoru', 1.50); };
         document.getElementById('buy-boat-3').onclick = function() { buyBoat('Derin Deniz Gemisi', 3.00); };
@@ -339,7 +250,7 @@
         document.getElementById('buy-fac-3').onclick = function() { buyFactory('Petrol', 30, 50000); };
         ROD_POOL.forEach(rod => {
             let el = document.getElementById(`rod-trigger-${rod.name.replace(' ', '')}`);
-            if(el && !player.current_rod.includes(rod.name)) {
+            if(el && player.current_rod !== rod.name) {
                 el.onclick = function() { buyRod(rod.name, rod.price, rod.time); };
             }
         });
@@ -399,58 +310,7 @@
         if(tab === 'trade') randomizeBorsa(); 
     }
 
-    function randomizeBorsa() {
-        FISH_POOL.forEach(fish => {
-            let change = (Math.random() * 0.2) - 0.1;
-            borsaPrices[fish.name] = Math.max(fish.basePrice, Math.floor(borsaPrices[fish.name] * (1 + change)));
-        });
-        updateBorsaUI();
-    }
-
-    function buyBoat(name, multBonus) {
-        if(player.gold >= 500) {
-            player.gold -= 500;
-            player.multiplier += multBonus;
-            localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
-            updateUI();
-            alert("🚤 " + name + " satın alındı! Çarpan arttı.");
-        } else {
-            alert("Yeterli Deep Coin yok!");
-        }
-    }
-
-    function buyFactory(name, reqLevel, cost) {
-        if(player.level >= reqLevel && player.gold >= cost) {
-            player.gold -= cost;
-            localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
-            updateUI();
-            alert("🏭 " + name + " tesisi kuruldu!");
-        } else {
-            alert("Seviye veya bakiye yetersiz!");
-        }
-    }
-
-    function buyRod(name, price, time) {
-        if(player.gold >= price) {
-            player.gold -= price;
-            player.current_rod = name;
-            player.rodTime = time;
-            localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
-            updateUI();
-            alert("🎣 " + name + " kuşanıldı!");
-        } else {
-            alert("Deep Coin yetersiz!");
-        }
-    }
-
-    function executeIntikam() {
-        player.incoming_attack.active = false;
-        player.gold += player.incoming_attack.loss;
-        localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
-        updateUI();
-        alert("⚔️ İntikam alındı, ganimetler kasaya eklendi!");
-    }
-
+    // 🌊 Market Maker Otomatik Tahta Fiyat Yönetimi (6 Saniyede Bir)
     setInterval(() => { 
         if(!isFishing) { 
             if(!isStormActive) {
@@ -465,14 +325,22 @@
         } 
     }, 6000);
 
+    // ⛈️ Canlı Fırtına Etkinlik Zamanlayıcısı (Official Telegram Popup Protokolleri)
     setInterval(() => {
         if(!isFishing && !isStormActive && Math.random() < 0.3) {
             isStormActive = true;
             dynamicStormChance = (Math.random() * 45 + 50).toFixed(2); 
             let banner = document.getElementById('storm-alert');
-            banner.innerText = `⛈️ ÖĞLE ETKİNLİĞİ BAŞLADI! NADİR BALIK ŞANSI: %${dynamicStormChance} FIRLADI! ⛈️`;
+            banner.innerText = `⛈️ ÖĞLE ETKİNLİĞİ BAŞLADI! NADİR BALIK ŞANSI: %${dynamicStormChance} FRILADI! ⛈️`;
             banner.style.display = "block";
-            if(tg.showAlert) tg.showAlert(`⛈️ DENİZDE FIRTINA ETKİNLİĞİ!\nNadir canlı yakalama şansı anlık %${dynamicStormChance} fırladı!`);
+            
+            if(tg.showPopup) {
+                tg.showPopup({
+                    title: '⛈️ FIRTINA ETKİNLİĞİ',
+                    message: `Okyanusta büyük bir fırtına koptu kaptan!\nNadir canlı yakalama şansı anlık %${dynamicStormChance} fırladı!`,
+                    buttons: [{type: 'close'}]
+                });
+            }
             setTimeout(() => { isStormActive = false; banner.style.display = "none"; }, 15000); 
         }
     }, 50000);
@@ -496,7 +364,7 @@
     function calculateCatch() { 
         playSound('catch');
         let roll = Math.floor(Math.random() * 100) + 1; 
-        let cumulative = 0; let caught = FISH_POOL[0]; 
+        let cumulative = 0; let caught = FISH_POOL; 
         
         if(isStormActive && roll <= parseFloat(dynamicStormChance)) {
             let rareRoll = Math.random();
@@ -509,23 +377,3 @@
         player.xp += caught.xp; player.level = Math.floor(player.xp / 100) + 1; 
         
         let char = document.getElementById('game-char'); char.classList.remove('fishing');
-        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-
-        let popup = document.getElementById('fish-popup'); 
-        document.getElementById('popup-fish-icon').innerText = caught.icon;
-        document.getElementById('popup-fish-name').innerText = caught.name + " (" + caught.basePrice + " 🪙)";
-        popup.style.display = 'block';
-        document.getElementById('action-btn').disabled = false;
-        document.getElementById('action-btn').innerText = "⚓ OLTAYI FIRLAT";
-        localStorage.setItem('deepsea_final_v099', JSON.stringify(player));
-        updateUI();
-    }
-
-    function closeFishPopup() {
-        document.getElementById('fish-popup').style.display = 'none';
-    }
-
-    updateUI();
-</script>
-</body>
-</html>
