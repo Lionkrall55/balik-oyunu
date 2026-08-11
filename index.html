@@ -3,496 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DeepSea Pro - Cyber Fishing</title>
-    <!-- Telegram Web App Kütüphanesi -->
+    <title>Deep Sea: Realism & Conquest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --primary: #00f2fe;
-            --secondary: #4facfe;
-            --bg: #00040a;
-            --surface: rgba(0, 8, 16, 0.95);
-            --text: #ffffff;
-            --accent: #ef4444;
+            --neon-blue: #00f2fe;
+            --deep-ocean: #000b14;
+            --glass: rgba(0, 20, 40, 0.85);
             --gold: #ffd700;
-            --success: #22c55e;
+            --star-purple: #8a2be2;
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background: var(--bg); color: var(--text); 
-            user-select: none; -webkit-user-select: none; font-family: 'Segoe UI', Roboto, sans-serif; 
+            overflow: hidden; background: var(--deep-ocean); color: white; 
+            font-family: 'Inter', -apple-system, sans-serif;
         }
 
-        .container { display: flex; flex-direction: column; height: 100vh; position: relative; }
-        
-        /* Grafik Katmanı */
-        #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        
-        /* UI Katmanı */
-        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+        #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 100%); z-index: 5; pointer-events: none; }
+
+        .ui-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; pointer-events: none; }
         .interactive { pointer-events: auto; }
 
-        /* Üst Panel */
-        .header { 
-            background: var(--surface); padding: 12px; border-bottom: 2px solid var(--primary); 
-            box-shadow: 0 4px 20px rgba(0,242,254,0.3); display: flex; justify-content: space-between; align-items: center; 
-        }
-        .user-info { font-size: 12px; color: var(--primary); font-weight: bold; letter-spacing: 1px; }
-        .stats { display: flex; gap: 12px; font-size: 14px; font-weight: bold; }
-        .deep-coin-icon { color: var(--gold); margin-right: 4px; text-shadow: 0 0 8px var(--gold); }
-
-        /* Ana Buton */
-        .main-btn { 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
-            color: #000; border: none; padding: 15px 35px; font-size: 16px; font-weight: bold; 
-            border-radius: 50px; cursor: pointer; box-shadow: 0 5px 20px rgba(0, 242, 254, 0.4); 
-            margin-bottom: 90px; transition: 0.2s;
-        }
-        .main-btn:active { transform: scale(0.95); }
-        .main-btn:disabled { background: #1e293b; color: #475569; box-shadow: none; }
-
-        /* Navigasyon */
-        .nav-tabs { display: flex; background: #000; border-top: 1px solid #1e293b; padding-bottom: env(safe-area-inset-bottom); }
-        .tab-btn { flex: 1; background: none; border: none; color: #475569; padding: 15px 0; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--primary); border-top: 2px solid var(--primary); }
-
-        /* Menüler */
-        .menu-view { 
-            display: none; width: 90%; max-height: 50vh; overflow-y: auto; 
-            background: rgba(0, 2, 5, 0.98); border: 1px solid #1e293b; border-radius: 20px; 
-            padding: 15px; position: absolute; bottom: 85px; left: 5%; 
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.8); 
+        /* Modern Glass UI */
+        .top-bar { 
+            background: var(--glass); padding: 15px; border-bottom: 1px solid rgba(0,242,254,0.3);
+            display: flex; justify-content: space-between; backdrop-filter: blur(15px);
         }
 
-        .shop-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px; border-bottom: 1px solid #1e293b; 
-        }
-        .buy-btn { background: var(--primary); color: #000; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .currency-box { display: flex; flex-direction: column; align-items: center; }
+        .currency-val { font-size: 18px; font-weight: 800; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .stars-val { color: var(--star-purple); text-shadow: 0 0 10px var(--star-purple); }
 
-        /* Popuplar */
-        .fish-card {
-            display: none; position: absolute; background: var(--surface); border: 2px solid var(--primary);
-            border-radius: 20px; padding: 20px; width: 220px; text-align: center;
-            left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 100;
-            box-shadow: 0 0 50px var(--primary);
-        }
+        /* Merkez Aksiyon */
+        .action-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 100px; }
+        
+        .progress-container { width: 80%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
+        #progress-bar { width: 0%; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
 
-        #alert-box {
-            display: none; position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);
-            background: var(--surface); border: 2px solid var(--success); border-radius: 20px;
-            padding: 20px; width: 260px; text-align: center; z-index: 200;
+        .btn-cast {
+            background: linear-gradient(180deg, #00f2fe, #0061ff);
+            border: none; padding: 20px 60px; border-radius: 50px;
+            color: white; font-size: 20px; font-weight: 900; letter-spacing: 2px;
+            box-shadow: 0 15px 35px rgba(0, 97, 255, 0.5); cursor: pointer; transition: 0.3s;
         }
 
-        select { background: #000; color: var(--primary); border: 1px solid var(--primary); border-radius: 5px; }
+        /* Alt Menü */
+        .nav-bar { 
+            background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; 
+            padding: 15px 0 30px 0; border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-item { background: none; border: none; color: #666; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .nav-item.active { color: var(--neon-blue); }
+
+        /* Gelişmiş Market Paneli */
+        .side-panel {
+            display: none; position: absolute; top: 0; right: 0; width: 100%; height: 100%;
+            background: var(--deep-ocean); z-index: 100; overflow-y: auto; padding: 20px; box-sizing: border-box;
+        }
+        .market-section { margin-bottom: 30px; }
+        .market-card {
+            background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .market-info h4 { margin: 0; color: var(--neon-blue); }
+        .market-info p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.7; }
+        .buy-btn { background: var(--neon-blue); color: black; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; }
+        .buy-btn.stars { background: var(--star-purple); color: white; }
+
     </style>
 </head>
 <body>
 
 <canvas id="game-canvas"></canvas>
+<div class="overlay"></div>
 
-<div class="ui-layer">
-    <!-- Üst Bilgi Çubuğu -->
-    <div class="header interactive">
-        <div id="username-display" class="user-info">⚓ KAPTAN: @Oyuncu</div>
-        <div class="stats">
-            <div><span class="deep-coin-icon">💰</span><span id="gold-display">0</span></div>
-            <div>🌟 Lv.<span id="level-display">1</span></div>
-            <div style="color:var(--gold);">⭐ <span id="x-display">1.00</span>X</div>
+<div class="ui-container">
+    <div class="top-bar interactive">
+        <div class="currency-box">
+            <span class="currency-val" id="gold-val">0</span>
+            <span class="stat-label">DEEP COIN</span>
         </div>
-        <select id="lang-select" class="interactive" onchange="changeLanguage(this.value)">
-            <option value="tr">🇹🇷 TR</option>
-            <option value="en">🇺🇸 EN</option>
-            <option value="ru">🇷🇺 RU</option>
-            <option value="de">🇩🇪 DE</option>
-        </select>
-    </div>
-
-    <!-- Aksiyon Alanı -->
-    <div style="text-align: center; width: 100%;">
-        <div id="status-msg" style="margin-bottom:10px; font-weight:bold; color:#94a3b8; text-shadow: 0 2px 4px #000;">Okyanus seni bekliyor...</div>
-        <button id="action-btn" class="main-btn interactive" onclick="startFishing()">⚓ OLTAYI FIRLAT</button>
-    </div>
-
-    <!-- Menüler -->
-    <div id="trade-menu" class="menu-view interactive">
-        <h3 id="view-title-borsa" style="color:var(--success);">🏛️ Canlı Borsa</h3>
-        <canvas id="chart-canvas-view" style="width:100%; height:100px; background:#000; border-radius:10px; margin-bottom:10px;"></canvas>
-        <div id="market-list"></div>
-        <button class="main-btn interactive" style="width:100%; margin:10px 0; padding:10px;" onclick="sellAllFish()">💰 Tümünü Sat (%10 Vergi)</button>
-    </div>
-
-    <div id="shop-menu" class="menu-view interactive">
-        <h3 id="view-title-market" style="color:var(--primary);">🛒 Market</h3>
-        <div id="shop-items-container"></div>
-        <div style="margin-top:10px; border-top:1px solid #1e293b; padding-top:10px;">
-            <input type="text" id="promo-input" placeholder="Promosyon Kodu" style="padding:8px; width:60%; border-radius:5px; border:1px solid #1e293b; background:#000; color:#fff;">
-            <button class="buy-btn" onclick="claimPromoCode()">GİR</button>
+        <div class="currency-box">
+            <span class="currency-val stars-val" id="stars-val">0</span>
+            <span class="stat-label">STARS</span>
+        </div>
+        <div class="currency-box">
+            <span class="currency-val" id="level-val" style="color: #fff">1</span>
+            <span class="stat-label">LEVEL</span>
         </div>
     </div>
 
-    <div id="pvp-menu" class="menu-view interactive">
-        <h3 id="view-title-pvp" style="color:var(--accent);">⚔️ PvP Arena</h3>
-        <p style="font-size:12px;">Diğer limanlara saldır ve ganimet topla!</p>
-        <button class="main-btn interactive" style="width:100%; background:var(--accent); color:white;" onclick="simulatePvP()">SALDIRI BAŞLAT (10 🪙)</button>
-        <div id="pvp-result" style="margin-top:10px; font-weight:bold;"></div>
+    <div class="action-area">
+        <div class="progress-container" id="p-container"><div id="progress-bar"></div></div>
+        <button id="cast-btn" class="btn-cast interactive" onclick="handleAction()">OLTA AT</button>
+        <p id="location-name" style="margin-top: 15px; font-size: 12px; color: var(--neon-blue); font-weight: bold;">📍 SIĞ KIYI ŞERİDİ</p>
     </div>
 
-    <div id="inv-menu" class="menu-view interactive">
-        <h3 id="view-title-kova" style="color:#a855f7;">🎒 Kova</h3>
-        <div id="inv-list"></div>
-    </div>
-
-    <!-- Alt Navigasyon -->
-    <div class="nav-tabs interactive">
-        <button id="btn-fish" class="tab-btn active" onclick="switchTab('fish')">🎣 Avlan</button>
-        <button id="btn-trade" class="tab-btn" onclick="switchTab('trade')">🏛️ Borsa</button>
-        <button id="btn-shop" class="tab-btn" onclick="switchTab('shop')">🛒 Market</button>
-        <button id="btn-pvp" class="tab-btn" onclick="switchTab('pvp')">⚔️ PvP</button>
-        <button id="btn-inv" class="tab-btn" onclick="switchTab('inv')">🎒 Kova</button>
+    <div class="nav-bar interactive">
+        <button class="nav-item active" onclick="showPanel('game')">DENİZ</button>
+        <button class="nav-item" onclick="showPanel('shop')">MARKET</button>
+        <button class="nav-item" onclick="showPanel('ships')">FİLO</button>
+        <button class="nav-item" onclick="showPanel('ports')">LİMANLAR</button>
     </div>
 </div>
 
-<!-- Bildirim Popupları -->
-<div id="fish-popup" class="fish-card interactive" onclick="this.style.display='none'">
-    <span id="card-icon" style="font-size:50px; display:block;">🐟</span>
-    <h2 id="card-name" style="margin:10px 0;">Sardalya</h2>
-    <div id="card-reward" style="color:var(--success); font-weight:bold;">+5 XP</div>
-</div>
+<!-- Market Paneli -->
+<div id="shop-panel" class="side-panel interactive">
+    <div style="display:flex; justify-content: space-between; align-items:center;">
+        <h2>🛒 MERKEZ MARKET</h2>
+        <button onclick="showPanel('game')" style="background:none; border:1px solid #fff; color:#fff; border-radius:50%; width:30px; height:30px;">X</button>
+    </div>
+    
+    <div class="market-section">
+        <h3>🎣 Oltalar (Hız Geliştirme)</h3>
+        <div id="rods-list"></div>
+    </div>
 
-<div id="alert-box" class="interactive">
-    <div id="alert-title" style="font-weight:bold; margin-bottom:10px;">BİLDİRİM</div>
-    <div id="alert-msg" style="font-size:13px; margin-bottom:15px;"></div>
-    <button class="buy-btn" style="width:100%" onclick="document.getElementById('alert-box').style.display='none'">TAMAM</button>
+    <div class="market-section">
+        <h3>🛡️ Güvenlik ve Yardımcılar</h3>
+        <div class="market-card">
+            <div class="market-info"><h4>Port Kalkanı (24s)</h4><p>PvP saldırılarından %100 korur.</p></div>
+            <button class="buy-btn">500 🪙</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // --- BAŞLANGIÇ AYARLARI ---
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    const chartCanvas = document.getElementById('chart-canvas-view');
-    const cCtx = chartCanvas.getContext('2d');
-
+    // OYUN VERİLERİ
     let player = {
-        username: tg.initDataUnsafe?.user?.username || "Kaptan",
-        gold: 100, xp: 0, level: 1, multiplier: 1.0, logo: "⚓",
-        inventory: {}, used_promos: [], active_lang: "tr"
+        gold: 100, stars: 0, level: 1, xp: 0,
+        rodLevel: 1, 
+        ship: 'Sandal',
+        location: 'Kıyı',
+        shieldActive: false
     };
 
-    const FISH_POOL = [
-        {name:"Sardalya", chance:45, basePrice:10, xp:5, icon:"🐟"},
-        {name:"Hamsi", chance:25, basePrice:18, xp:8, icon:"🐠"},
-        {name:"Somon", chance:15, basePrice:45, xp:20, icon:"🐟"},
-        {name:"Orkinos", chance:10, basePrice:90, xp:45, icon:"🐟"},
-        {name:"Köpek Balığı", chance:4, basePrice:250, xp:100, icon:"🦈"},
-        {name:"Mavi Balina", chance:1, basePrice:800, xp:250, icon:"🐋"}
+    const RODS = [
+        { name: "Eski Dal", speed: 10, cost: 0 },
+        { name: "Bambu Olta", speed: 8, cost: 500 },
+        { name: "Fiber Klasik", speed: 6, cost: 2500 },
+        { name: "Karbon Pro", speed: 4, cost: 10000 },
+        { name: "Cyber-Magnet", speed: 2, cost: 50000 },
+        { name: "Kuantum İp", speed: 1, cost: 250000 }
     ];
 
-    const LANG_DATA = {
-        tr: { cast: "⚓ OLTAYI FIRLAT", status: "Okyanus seni bekliyor...", borsa: "🏛️ Canlı Borsa", market: "🛒 Market", pvp: "⚔️ PvP Arena", kova: "🎒 Kova" },
-        en: { cast: "⚓ CAST LINE", status: "Ocean awaits you...", borsa: "🏛️ Live Exchange", market: "🛒 Shop", pvp: "⚔️ PvP Arena", kova: "🎒 Inventory" },
-        ru: { cast: "⚓ ЗАБРОСИТЬ", status: "Океан ждет тебя...", borsa: "🏛️ Биржа", market: "🛒 Магазин", pvp: "⚔️ PvP Арена", kova: "🎒 Склад" },
-        de: { cast: "⚓ ANGELN", status: "Der Ozean wartet...", borsa: "🏛️ Börse", market: "🛒 Laden", pvp: "⚔️ PvP Arena", kova: "🎒 Eimer" }
-    };
+    const PORTS = [
+        { name: "Sığ Kıyı", multiplier: 1, minLevel: 1, cost: 0 },
+        { name: "Derin Çukur", multiplier: 3, minLevel: 10, cost: 5000 },
+        { name: "Antik Resif", multiplier: 10, minLevel: 25, cost: 50, type: 'stars' }
+    ];
 
-    let borsaPrices = {};
-    let priceHistory = {};
-    let selectedFish = "Somon";
-    let isFishing = false;
+    // GRAFİK MOTORU (Realistic Water)
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
     let waveTime = 0;
-
-    // --- GRAFİK MOTORU ---
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        chartCanvas.width = chartCanvas.parentElement.clientWidth;
-        chartCanvas.height = 100;
-    }
-    window.onresize = resize;
-    resize();
 
     function render() {
         ctx.clearRect(0,0, canvas.width, canvas.height);
-        waveTime += 0.03;
+        waveTime += 0.015;
 
-        // Deniz Çizimi
-        let seaLevel = canvas.height * 0.6;
-        ctx.fillStyle = "rgba(0, 242, 254, 0.1)";
-        ctx.beginPath();
-        ctx.moveTo(0, seaLevel);
-        for(let i=0; i<=canvas.width; i+=20) {
-            ctx.lineTo(i, seaLevel + Math.sin(waveTime + i*0.01)*10);
-        }
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.fill();
+        // Arka Plan (Deep Sea Gradient)
+        let bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        bg.addColorStop(0, '#001a2e');
+        bg.addColorStop(1, '#00040a');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0,0, canvas.width, canvas.height);
 
-        // Kaptan Çizimi (Basit Temsil)
-        let cx = canvas.width/2;
-        let cy = canvas.height*0.5;
-        ctx.strokeStyle = isFishing ? "#ef4444" : "#00f2fe";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(cx-15, cy-30, 30, 45); // Gövde
-
-        // Olta İpi
-        ctx.beginPath();
-        ctx.moveTo(cx, cy-10);
-        if(isFishing) {
-            ctx.lineTo(cx + Math.sin(waveTime*5)*10, seaLevel + 20);
-        } else {
-            ctx.lineTo(cx + 30, cy + 20);
-        }
-        ctx.stroke();
+        // Katmanlı Gerçekçi Dalgalar
+        drawWave(0.5, 0.01, 15, "rgba(0, 242, 254, 0.05)");
+        drawWave(0.8, 0.02, 10, "rgba(0, 150, 255, 0.1)");
+        drawWave(0.3, 0.015, 20, "rgba(0, 10, 20, 0.8)");
 
         requestAnimationFrame(render);
     }
 
-    // --- OYUN MANTIĞI ---
-    function startFishing() {
+    function drawWave(speedMult, freq, amp, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        let yBase = canvas.height * 0.7;
+        ctx.moveTo(0, yBase);
+        for(let i=0; i<=canvas.width; i+=10) {
+            let y = yBase + Math.sin(waveTime * speedMult + i * freq) * amp;
+            ctx.lineTo(i, y);
+        }
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.fill();
+    }
+
+    // OYNANIŞ MANTIĞI
+    let isFishing = false;
+
+    function handleAction() {
         if(isFishing) return;
+        
         isFishing = true;
-        playSound('cast');
+        const currentRod = RODS[player.rodLevel - 1];
+        const castBtn = document.getElementById('cast-btn');
+        const pBar = document.getElementById('progress-bar');
+        const pContainer = document.getElementById('p-container');
+
+        castBtn.disabled = true;
+        pContainer.style.display = 'block';
         
-        let btn = document.getElementById('action-btn');
-        btn.disabled = true;
-        
-        let time = player.inventory["hizlandirici"] > 0 ? 3000 : 6000;
-        let count = time/1000;
-        
-        let timer = setInterval(() => {
-            count--;
-            btn.innerText = `⏳ ${count}s`;
-            if(count <= 0) {
-                clearInterval(timer);
+        let duration = currentRod.speed * 1000;
+        let start = null;
+
+        function animateProgress(timestamp) {
+            if (!start) start = timestamp;
+            let progress = timestamp - start;
+            let percent = Math.min((progress / duration) * 100, 100);
+            pBar.style.width = percent + "%";
+
+            if (progress < duration) {
+                requestAnimationFrame(animateProgress);
+            } else {
                 finishFishing();
             }
-        }, 1000);
+        }
+        requestAnimationFrame(animateProgress);
+        tg.HapticFeedback.impactOccurred('medium');
     }
 
     function finishFishing() {
         isFishing = false;
-        let btn = document.getElementById('action-btn');
-        btn.disabled = false;
-        btn.innerText = LANG_DATA[player.active_lang].cast;
+        document.getElementById('cast-btn').disabled = false;
+        document.getElementById('p-container').style.display = 'none';
+        document.getElementById('progress-bar').style.width = "0%";
 
-        let roll = Math.random() * 100;
-        let cumulative = 0;
-        let caught = FISH_POOL[0];
-
-        for(let f of FISH_POOL) {
-            cumulative += f.chance;
-            if(roll <= cumulative) { caught = f; break; }
+        // Kazanç Hesaplama (Liman çarpanı ve seviye etkisi)
+        let gain = Math.floor(Math.random() * 20) + 10;
+        player.gold += gain;
+        player.xp += 15;
+        
+        // Seviye Atlama
+        if(player.xp >= player.level * 100) {
+            player.level++;
+            player.xp = 0;
+            tg.showPopup({ title: 'SEVİYE ATLADIN!', message: `Artık Seviye ${player.level} balıkçısısın!` });
         }
 
-        player.inventory[caught.name] = (player.inventory[caught.name] || 0) + 1;
-        player.xp += caught.xp;
-        player.level = Math.floor(player.xp / 200) + 1;
-        player.multiplier += 0.01;
-
-        showFishPopup(caught);
         updateUI();
-        saveGame();
-        playSound('catch');
         tg.HapticFeedback.notificationOccurred('success');
     }
 
-    function sellAllFish() {
-        let total = 0;
-        for(let name in player.inventory) {
-            if(borsaPrices[name]) total += borsaPrices[name] * player.inventory[name];
-        }
-        if(total === 0) return showAlert("Kova boş!");
-
-        let tax = Math.floor(total * 0.1);
-        let net = total - tax;
-        player.gold += net;
-        player.inventory = {};
-        
-        updateUI();
-        saveGame();
-        showAlert(`🏛️ Satış Başarılı!<br>Kazanç: ${net} 🪙<br>Vergi: ${tax} 🪙`);
-        playSound('cash');
-    }
-
-    // --- BORSA SİSTEMİ ---
-    function initBorsa() {
-        FISH_POOL.forEach(f => {
-            borsaPrices[f.name] = f.basePrice;
-            priceHistory[f.name] = Array(20).fill(f.basePrice);
-        });
-    }
-
-    setInterval(() => {
-        FISH_POOL.forEach(f => {
-            let change = (Math.random() * 0.2) - 0.1; // %10 dalgalanma
-            borsaPrices[f.name] = Math.max(5, Math.floor(borsaPrices[f.name] * (1 + change)));
-            priceHistory[f.name].push(borsaPrices[f.name]);
-            if(priceHistory[f.name].length > 20) priceHistory[f.name].shift();
-        });
-        if(document.getElementById('trade-menu').style.display === 'block') {
-            renderLiveBorsa();
-            drawChart();
-        }
-    }, 3000);
-
-    function drawChart() {
-        cCtx.clearRect(0,0, chartCanvas.width, chartCanvas.height);
-        let data = priceHistory[selectedFish];
-        let max = Math.max(...data);
-        let min = Math.min(...data);
-        let range = max - min || 10;
-
-        cCtx.strokeStyle = varColor('--success');
-        cCtx.beginPath();
-        data.forEach((p, i) => {
-            let x = (i / 19) * chartCanvas.width;
-            let y = chartCanvas.height - ((p - min) / range * chartCanvas.height);
-            if(i === 0) cCtx.moveTo(x, y); else cCtx.lineTo(x, y);
-        });
-        cCtx.stroke();
-    }
-
-    function renderLiveBorsa() {
-        let html = "";
-        FISH_POOL.forEach(f => {
-            html += `<div class="shop-item" onclick="selectedFish='${f.name}';drawChart();" style="${selectedFish===f.name?'border:1px solid var(--primary)':''}">
-                <div>${f.icon} ${f.name}</div>
-                <div style="color:var(--success)">${borsaPrices[f.name]} 🪙</div>
-            </div>`;
-        });
-        document.getElementById('market-list').innerHTML = html;
-    }
-
-    // --- MARKET & DİL ---
-    function buildShopUI() {
-        const items = [
-            {id:"hizlandirici", name:"🚀 Hızlandırıcı Yem", cost:500, desc:"Olta süresini yarıya indirir (5 kullanım)"},
-            {id:"vippas", name:"🎫 VIP Giriş", cost:5000, desc:"Tüm satışlarda vergiyi %5'e düşürür"}
-        ];
-        let html = "";
-        items.forEach(i => {
-            html += `<div class="shop-item">
-                <div><strong>${i.name}</strong><br><small>${i.desc}</small></div>
-                <button class="buy-btn" onclick="buyItem('${i.id}', ${i.cost})">${i.cost} 🪙</button>
-            </div>`;
-        });
-        document.getElementById('shop-items-container').innerHTML = html;
-    }
-
-    function buyItem(id, cost) {
-        if(player.gold < cost) return showAlert("Yetersiz altın!");
-        player.gold -= cost;
-        player.inventory[id] = (player.inventory[id] || 0) + (id === "hizlandirici" ? 5 : 1);
-        updateUI();
-        saveGame();
-        showAlert("Satın alındı!");
-    }
-
-    function changeLanguage(lang) {
-        player.active_lang = lang;
-        let d = LANG_DATA[lang];
-        document.getElementById('action-btn').innerText = d.cast;
-        document.getElementById('view-title-borsa').innerText = d.borsa;
-        document.getElementById('view-title-market').innerText = d.market;
-        document.getElementById('view-title-pvp').innerText = d.pvp;
-        document.getElementById('view-title-kova').innerText = d.kova;
-        document.getElementById('btn-fish').innerText = lang==="tr"?"🎣 Avlan":"🎣 Fish";
-    }
-
-    // --- SİSTEM ---
     function updateUI() {
-        document.getElementById('gold-display').innerText = Math.floor(player.gold);
-        document.getElementById('level-display').innerText = player.level;
-        document.getElementById('x-display').innerText = player.multiplier.toFixed(2);
-        document.getElementById('username-display').innerText = `${player.logo} KAPTAN: @${player.username}`;
+        document.getElementById('gold-val').innerText = player.gold;
+        document.getElementById('stars-val').innerText = player.stars;
+        document.getElementById('level-val').innerText = player.level;
     }
 
-    function switchTab(tab) {
-        document.querySelectorAll('.menu-view').forEach(m => m.style.display = 'none');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        if(tab !== 'fish') {
-            document.getElementById(tab + '-menu').style.display = 'block';
-            document.getElementById('btn-' + tab).classList.add('active');
-        } else {
-            document.getElementById('btn-fish').classList.add('active');
+    // MARKET SİSTEMİ
+    function showPanel(panel) {
+        document.querySelectorAll('.side-panel').forEach(p => p.style.display = 'none');
+        if(panel === 'shop') {
+            document.getElementById('shop-panel').style.display = 'block';
+            renderRodMarket();
         }
-        if(tab === 'inv') renderInventory();
-        if(tab === 'shop') buildShopUI();
-        tg.HapticFeedback.selectionChanged();
     }
 
-    function renderInventory() {
+    function renderRodMarket() {
         let html = "";
-        for(let n in player.inventory) {
-            if(player.inventory[n]>0) html += `<div class="shop-item"><span>${n}</span><span>x${player.inventory[n]}</span></div>`;
+        RODS.forEach((rod, index) => {
+            let isOwned = player.rodLevel > index;
+            let isNext = player.rodLevel === index;
+            html += `
+                <div class="market-card">
+                    <div class="market-info">
+                        <h4>${rod.name}</h4>
+                        <p>Hız: ${rod.speed}sn</p>
+                    </div>
+                    <button class="buy-btn" ${isOwned || !isNext ? 'disabled' : ''} onclick="buyRod(${index})">
+                        ${isOwned ? 'SAHİPSİN' : rod.cost + ' 🪙'}
+                    </button>
+                </div>
+            `;
+        });
+        document.getElementById('rods-list').innerHTML = html;
+    }
+
+    function buyRod(index) {
+        let rod = RODS[index];
+        if(player.gold >= rod.cost) {
+            player.gold -= rod.cost;
+            player.rodLevel = index + 1;
+            updateUI();
+            renderRodMarket();
+            tg.HapticFeedback.notificationOccurred('success');
         }
-        document.getElementById('inv-list').innerHTML = html || "Kova boş...";
     }
 
-    function showFishPopup(f) {
-        let p = document.getElementById('fish-popup');
-        document.getElementById('card-icon').innerText = f.icon;
-        document.getElementById('card-name').innerText = f.name;
-        document.getElementById('card-reward').innerText = `+${f.xp} XP | +0.01X`;
-        p.style.display = 'block';
-        setTimeout(() => p.style.display = 'none', 3000);
-    }
-
-    function showAlert(msg) {
-        document.getElementById('alert-msg').innerHTML = msg;
-        document.getElementById('alert-box').style.display = 'block';
-    }
-
-    function simulatePvP() {
-        if(player.gold < 10) return showAlert("Yetersiz altın!");
-        player.gold -= 10;
-        let win = Math.random() > 0.6;
-        let res = document.getElementById('pvp-result');
-        if(win) {
-            let gain = player.level * 50;
-            player.gold += gain;
-            res.innerText = `🎯 ZAFER! ${gain} 🪙 kazandın.`;
-            res.style.color = "var(--success)";
-        } else {
-            res.innerText = "💀 BOZGUN! Ganimet kaptırdın.";
-            res.style.color = "var(--accent)";
-        }
-        updateUI();
-        saveGame();
-    }
-
-    function saveGame() { localStorage.setItem('deepsea_save', JSON.stringify(player)); }
-    function loadGame() {
-        let s = localStorage.getItem('deepsea_save');
-        if(s) player = {...player, ...JSON.parse(s)};
-    }
-
-    function playSound(type) {
-        let ctx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = ctx.createOscillator();
-        let g = ctx.createGain();
-        osc.connect(g); g.connect(ctx.destination);
-        if(type==='cast') osc.frequency.value = 200;
-        else if(type==='catch') osc.frequency.value = 800;
-        else osc.frequency.value = 1200;
-        g.gain.setValueAtTime(0.1, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-        osc.start(); osc.stop(ctx.currentTime + 0.2);
-    }
-
-    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-
+    // BAŞLAT
     window.onload = () => {
-        loadGame();
-        initBorsa();
-        updateUI();
+        resize();
         render();
-        changeLanguage('tr');
+        updateUI();
     };
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
 </script>
 </body>
 </html>
