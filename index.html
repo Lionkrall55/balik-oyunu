@@ -3,140 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deep Sea Fishing - Production</title>
+    <title>Deep Sea Pro - Elite Fishing</title>
+    <!-- Profesyonel Oyun Motoru (Phaser 3) -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --neon-blue: #00f2fe;
-            --deep-ocean: #00040a;
-            --glass: rgba(0, 15, 30, 0.9);
-            --gold: #ffd700;
-        }
-
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background: #000; color: white; 
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        /* Arka Plan Grafik Katmanı */
-        #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-
-        /* UI Katmanı - Tıklamaları geçirmesi için pointer-events:none */
-        .ui-container { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 10; display: flex; flex-direction: column; pointer-events: none; 
-        }
-
-        /* Tıklanabilir alanlar için pointer-events:auto */
-        .interactive { pointer-events: auto; }
-
-        /* Üst Panel */
-        .top-bar { 
-            background: var(--glass); padding: 15px; border-bottom: 2px solid var(--neon-blue);
-            display: flex; justify-content: space-around; backdrop-filter: blur(10px);
-        }
-        .stat-box { text-align: center; }
-        .stat-val { display: block; font-size: 18px; font-weight: 900; color: var(--gold); }
-        .stat-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; }
-
-        /* Orta Aksiyon Alanı */
-        .action-area { 
-            flex-grow: 1; display: flex; flex-direction: column; 
-            justify-content: flex-end; align-items: center; padding-bottom: 120px; 
-        }
+        body { margin: 0; padding: 0; background: #00040a; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
         
-        .main-btn {
-            background: linear-gradient(180deg, #00f2fe, #0061ff);
-            border: none; padding: 18px 50px; border-radius: 50px;
-            color: white; font-size: 20px; font-weight: 900;
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); cursor: pointer;
-            transition: transform 0.1s;
+        /* Modern Üst Panel (Glassmorphism) */
+        .header {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between;
+            padding: 15px; background: rgba(0, 20, 40, 0.7);
+            backdrop-filter: blur(15px); border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 20px; z-index: 100; color: white;
         }
-        .main-btn:active { transform: scale(0.9); }
-        .main-btn:disabled { background: #333; box-shadow: none; opacity: 0.5; }
 
-        /* Alt Navigasyon */
-        .nav-bar { 
-            background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; 
-            padding: 15px 0 35px 0; border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .nav-item { background: none; border: none; color: #555; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+        .stat { display: flex; flex-direction: column; align-items: center; }
+        .val { font-size: 18px; font-weight: 900; color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .lbl { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
 
-        /* Panel Pencereleri (Market, Filo vb.) */
-        .panel {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--deep-ocean); z-index: 100; padding: 25px; box-sizing: border-box;
-            overflow-y: auto;
+        /* Olta Atma Butonu */
+        #ui-footer {
+            position: absolute; bottom: 40px; width: 100%;
+            display: flex; flex-direction: column; align-items: center; z-index: 100;
         }
-        .panel-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid var(--neon-blue); margin-bottom: 20px; padding-bottom: 10px;
+
+        .cast-btn {
+            background: linear-gradient(180deg, #00f2fe 0%, #4facfe 100%);
+            border: none; padding: 20px 70px; border-radius: 50px;
+            color: white; font-size: 22px; font-weight: 900;
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.4);
+            cursor: pointer; transition: 0.2s;
         }
-        .close-btn { background: none; border: 1px solid white; color: white; padding: 5px 15px; border-radius: 5px; }
-        
-        .market-card {
-            background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+        .cast-btn:active { transform: scale(0.92); }
+        .cast-btn:disabled { background: #2c3e50; box-shadow: none; opacity: 0.6; }
+
+        /* Alt Menü */
+        .nav {
+            position: absolute; bottom: 0; width: 100%; height: 80px;
+            background: rgba(0,0,0,0.9); display: flex; justify-content: space-around;
+            padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 101;
         }
-        .buy-btn { background: var(--neon-blue); color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
+        .nav-item { color: #555; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
+        .nav-item.active { color: #00f2fe; }
     </style>
 </head>
 <body>
 
-<!-- Grafik Ekranı -->
-<canvas id="game-canvas"></canvas>
-
-<!-- Oyun Arayüzü -->
-<div class="ui-container">
-    <div class="top-bar interactive">
-        <div class="stat-box"><span id="gold-val" class="stat-val">0</span><span class="stat-label">DEEP COIN</span></div>
-        <div class="stat-box"><span id="stars-val" class="stat-val" style="color:#a855f7">0</span><span class="stat-label">STARS</span></div>
-        <div class="stat-box"><span id="level-val" class="stat-val" style="color:#fff">1</span><span class="stat-label">LEVEL</span></div>
-    </div>
-
-    <div class="action-area">
-        <div id="status-text" style="color:white; margin-bottom:10px; font-weight:bold; font-size:14px; text-shadow: 0 2px 4px #000;">Okyanus hazır, kaptan!</div>
-        <button id="cast-btn" class="main-btn interactive" onclick="startFishing()">OLTA AT</button>
-        <p id="loc-text" style="margin-top:15px; color:var(--neon-blue); font-weight:bold; font-size:12px;">📍 SIĞ KIYI ŞERİDİ</p>
-    </div>
-
-    <div class="nav-bar interactive">
-        <button id="nav-game" class="nav-item active" onclick="showPanel('game')">DENİZ</button>
-        <button id="nav-market" class="nav-item" onclick="showPanel('market')">MARKET</button>
-        <button id="nav-fleet" class="nav-item" onclick="showPanel('fleet')">FİLO</button>
-        <button id="nav-ports" class="nav-item" onclick="showPanel('ports')">LİMANLAR</button>
-    </div>
+<div class="header">
+    <div class="stat"><span class="val" id="gold">139</span><span class="lbl">DEEP COIN</span></div>
+    <div class="stat"><span class="val" style="color: #a855f7;">0</span><span class="lbl">STARS</span></div>
+    <div class="stat"><span class="val" style="color: #fff;">1</span><span class="lbl">LEVEL</span></div>
 </div>
 
-<!-- Menü Panelleri -->
-<div id="panel-market" class="panel interactive">
-    <div class="panel-header"><h2>🛒 MARKET</h2> <button class="close-btn" onclick="showPanel('game')">GERİ</button></div>
-    <div class="market-card"><div><h4>Karbon Olta</h4><p>Hız: 5sn | Seviye: 1</p></div> <button class="buy-btn">1.000 🪙</button></div>
-    <div class="market-card"><div><h4>Siber Yem</h4><p>Nadir Balık Şansı +%20</p></div> <button class="buy-btn">500 🪙</button></div>
+<div id="ui-footer">
+    <button id="main-cast-btn" class="cast-btn" onclick="gameCast()">OLTA AT</button>
 </div>
 
-<div id="panel-fleet" class="panel interactive">
-    <div class="panel-header"><h2>🚢 FİLOM</h2> <button class="close-btn" onclick="showPanel('game')">GERİ</button></div>
-    <div class="market-card"><div><h4>Demir Trol Gemi</h4><p>Kapasite: 100 Balık</p></div> <button class="buy-btn">5.000 🪙</button></div>
-    <div class="market-card"><div><h4>Abyss Explorer</h4><p>Derin Deniz Erişimi</p></div> <button class="buy-btn" style="background:#a855f7; color:white;">50 ⭐</button></div>
+<div class="nav">
+    <div class="nav-item active">🌊 DENİZ</div>
+    <div class="nav-item">🛒 MARKET</div>
+    <div class="nav-item">🚢 FİLO</div>
+    <div class="nav-item">📍 LİMANLAR</div>
 </div>
 
-<div id="panel-ports" class="panel interactive">
-    <div class="panel-header"><h2>📍 LİMANLAR</h2> <button class="close-btn" onclick="showPanel('game')">GERİ</button></div>
-    <div class="market-card"><div><h4>Mavi Derinlik</h4><p>Gereksinim: Seviye 5</p></div> <button class="buy-btn">KİLİTLİ</button></div>
-</div>
+<div id="game-container"></div>
 
 <script>
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
     const tg = window.Telegram.WebApp;
+    tg.expand();
 
-    let gold = 139;
-    let waveTime = 0;
-    let isFishing = false;
+    // Phaser 3 Konfigürasyonu
+    const config = {
+        type: Phaser.AUTO,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        parent: 'game-container',
+        scene: { preload: preload, create: create, update: update }
+    };
 
-    // Balıkçı Silueti
-    const fishermanImg = new Image();
+    const game = new Phaser.Game(config);
+    let player, water1, water2, water3, particles;
+
+    function preload() {
+        // Yüksek kaliteli gerçekçi görseller
+        // Bu linkler gerçekçi deniz ve balıkçı görselleridir
+        this.load.image('sky', 'https://images.unsplash.com/photo-1518837697219-af5237c14352?auto=format&fit=crop&w=1000&q=80');
+        this.load.image('waves', 'https://i.ibb.co/3pY6X0s/water-texture.png'); 
+        this.load.image('boat', 'https://i.ibb.co/X396mY6/fisherman-silhouette.png');
+    }
+
+    function create() {
+        // 1. Gökyüzü (Statik)
+        let sky = this.add.image(config.width/2, config.height/2, 'sky');
+        sky.setDisplaySize(config.width, config.height);
+
+        // 2. Parallax Deniz Katmanları (Gerçekçiliğin Sırrı)
+        water1 = this.add.tileSprite(config.width/2, config.height * 0.8, config.width, 400, 'waves').setAlpha(0.3);
+        water2 = this.add.tileSprite(config.width/2, config.height * 0.85, config.width, 400, 'waves').setAlpha(0.6).setTint(0x0055ff);
+        water3 = this.add.tileSprite(config.width/2, config.height * 0.9, config.width, 400, 'waves').setTint(0x001133);
+
+        // 3. Karakter (Gemi & Balıkçı)
+        player = this.add.image(config.width/2, config.height * 0.65, 'boat');
+        player.setScale(0.6);
+
+        // Gerçekçi Sallanma Animasyonu (Tween)
+        this.tweens.add({
+            targets: player,
+            y: player.y + 8,
+            angle: 1,
+            duration: 2500,
+            yoyo: true,
+            loop: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // 4. Parçacık Sistemi (Su Köpükleri)
+        particles = this.add.particles(0, 0, 'waves', {
+            speed: 100,
+            scale: { start: 0.05, end: 0 },
+            alpha: { start: 0.5, end: 0 },
+            blendMode: 'ADD',
+            emitting: false
+        });
+    }
+
+    function update() {
+        // Her katman farklı hızda hareket ederek derinlik yaratır
+        water1.tilePositionX += 0.2;
+        water2.tilePositionX += 0.5;
+        water3.tilePositionX += 0.8;
+    }
+
+    // Oyun Mekaniği (UI ile Bağlantı)
+    function gameCast() {
+        const btn = document.getElementById('main-cast-btn');
+        btn.disabled = true;
+        btn.innerText = "BEKLEYİN...";
+        
+        tg.HapticFeedback.impactOccurred('medium');
+
+        // Balık tutma animasyon simülasyonu
+        setTimeout(() => {
+            let gold = parseInt(document.getElementById('gold').innerText);
+            gold += Math.floor(Math.random() * 25) + 10;
+            document.getElementById('gold').innerText = gold;
+            
+            btn.disabled = false;
+            btn.innerText = "OLTA AT";
+            
+            tg.HapticFeedback.notificationOccurred('success');
+            
+            // Başarı Pop-up (Opsiyonel buraya eklenebilir)
+        }, 4000);
+    }
+</script>
+</body>
+</html>
