@@ -3,253 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deep Sea Pro - V1.1 Official</title>
-    <!-- Profesyonel Kütüphaneler -->
+    <title>DeepSea Pro - Masterpiece</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Water.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Sky.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --neon: #00f2fe; --gold: #ffd700; --deep: #000205; --purple: #a855f7; }
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; color: white; }
-        canvas { display: block; }
+        :root { --neon: #00f2fe; --gold: #ffd700; --deep: #00050a; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
+        
+        /* 🎥 SİNEMATİK POST-PROCESSING */
+        #render-container {
+            position: absolute; width: 100%; height: 100%;
+            filter: contrast(1.1) saturate(1.2) brightness(1.05);
+            z-index: 1;
+        }
 
-        /* Üst Panel */
-        .header {
+        /* 💎 ELİT UI TASARIMI */
+        .ui-panel {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 100;
-            display: flex; justify-content: space-around; padding: 20px 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
-            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,242,254,0.1);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+            padding: 25px 0; display: flex; justify-content: space-around;
+            backdrop-filter: blur(5px); border-bottom: 1px solid rgba(0,242,254,0.1);
         }
-        .stat { text-align: center; }
-        .val { display: block; font-size: 20px; font-weight: 900; color: var(--gold); }
-        .lbl { font-size: 9px; color: var(--neon); text-transform: uppercase; letter-spacing: 2px; }
+        .stat-box { text-align: center; }
+        .stat-val { display: block; font-size: 26px; font-weight: 900; color: var(--gold); text-shadow: 0 0 25px rgba(255,215,0,0.5); }
+        .stat-lbl { font-size: 10px; color: var(--neon); text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
 
-        /* Kasa Çubuğu */
-        .vault-ui {
-            position: absolute; top: 90px; left: 15px; right: 15px; z-index: 100;
-            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px;
-            display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+        /* 💰 KASA DURUMU (BANKA KALİTESİNDE) */
+        .vault-meter {
+            position: absolute; top: 115px; left: 20px; right: 20px; z-index: 100;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 15px; display: flex; align-items: center;
         }
-        .v-bar { flex-grow: 1; height: 6px; background: #000; border-radius: 3px; margin: 0 12px; overflow: hidden; }
-        .v-fill { width: 0.1%; height: 100%; background: linear-gradient(90deg, #ffd700, #ff8c00); box-shadow: 0 0 10px var(--gold); }
+        .v-bar { flex-grow: 1; height: 10px; background: #000; border-radius: 5px; margin: 0 15px; overflow: hidden; }
+        .v-fill { width: 0.5%; height: 100%; background: linear-gradient(90deg, #ffd700, #ff8c00); box-shadow: 0 0 20px var(--gold); transition: width 1.5s cubic-bezier(0.1, 0.7, 1.0, 0.1); }
 
-        /* Butonlar */
-        .action-hub { position: absolute; bottom: 120px; width: 100%; text-align: center; z-index: 100; }
-        .cast-btn {
+        /* ⚓ MASTER AKSİYON BUTONU */
+        .action-hub { position: absolute; bottom: 130px; width: 100%; text-align: center; z-index: 100; }
+        .btn-master {
             background: linear-gradient(180deg, #00f2fe 0%, #0061ff 100%);
-            border: none; padding: 20px 85px; border-radius: 60px;
-            color: white; font-size: 24px; font-weight: 900; box-shadow: 0 15px 50px rgba(0, 97, 255, 0.6);
-            cursor: pointer; text-transform: uppercase;
+            border: none; padding: 25px 95px; border-radius: 100px;
+            color: white; font-size: 24px; font-weight: 900; text-transform: uppercase;
+            box-shadow: 0 25px 70px rgba(0, 97, 255, 0.7);
+            cursor: pointer; letter-spacing: 5px; transition: 0.3s;
         }
+        .btn-master:active { transform: scale(0.9) translateY(10px); }
 
+        /* 📱 PRO NAVİGASYON */
         .nav {
-            position: absolute; bottom: 0; width: 100%; height: 90px; z-index: 100;
-            background: rgba(0,0,0,0.95); display: flex; justify-content: space-around;
-            padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);
+            position: absolute; bottom: 0; width: 100%; height: 100px; z-index: 100;
+            background: rgba(0,0,0,0.98); display: flex; justify-content: space-around;
+            padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .nav-item { color: #444; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .nav-item.active { color: var(--neon); }
+        .nav-item { color: #555; font-size: 11px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item.active { color: var(--neon); text-shadow: 0 0 15px var(--neon); }
 
-        /* Paneller */
-        .panel { 
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #00040a; z-index: 200; padding: 30px; box-sizing: border-box; overflow-y: auto;
-        }
-        .card { background: rgba(255,255,255,0.04); border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .buy-btn { background: var(--neon); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
-
-        #fish-popup {
-            display: none; position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%);
-            background: rgba(0,20,40,0.98); border: 2px solid var(--neon); border-radius: 30px;
-            padding: 40px; text-align: center; z-index: 300;
-        }
+        /* 🎨 KARAKTER VE GERÇEKÇİLİK KATMANI */
+        #game-canvas { position: absolute; top: 0; left: 0; z-index: 50; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="stat"><span class="val" id="g-v">139</span><span class="lbl">DEEP COIN</span></div>
-    <div class="stat"><span class="val" id="x-v" style="color:var(--neon)">0</span><span class="lbl">X-POINTS</span></div>
-    <div class="stat"><span class="val" id="lvl-v" style="color:#fff">1</span><span class="lbl">LEVEL</span></div>
+<div id="render-container"></div>
+<canvas id="game-canvas"></canvas>
+
+<div class="ui-panel">
+    <div class="stat-box"><span class="stat-val" id="gold">148</span><span class="stat-lbl">DEEP COIN</span></div>
+    <div class="stat-box"><span class="stat-val" id="xpoints" style="color:var(--neon)">12</span><span class="stat-lbl">X-POINTS</span></div>
+    <div class="stat-box"><span class="stat-val" style="color:#fff">1</span><span class="stat-lbl">SEVİYE</span></div>
 </div>
 
-<div class="vault-ui">
-    <span class="lbl" style="color:var(--gold)">KASA</span>
+<div class="vault-meter">
+    <span class="stat-lbl" style="color:var(--gold)">KASA</span>
     <div class="v-bar"><div id="v-fill" class="v-fill"></div></div>
-    <span id="v-text" style="color:#fff; font-size:10px; font-weight:bold;">0.1%</span>
+    <span id="v-text" style="font-size:12px; font-weight:900; color:white;">0.01%</span>
 </div>
 
 <div class="action-hub">
-    <button id="castBtn" class="cast-btn" onclick="handleCast()">OLTA AT</button>
+    <button id="castBtn" class="btn-master" onclick="handleCast()">OLTA AT</button>
+    <p style="color:var(--neon); font-size:10px; font-weight:bold; margin-top:25px; letter-spacing:8px; opacity:0.8;">📍 PACIFIC OCEAN SIM 4K</p>
 </div>
 
 <div class="nav">
-    <div class="nav-item active" onclick="showPanel('game')">🌊 DENİZ</div>
-    <div class="nav-item" onclick="showPanel('borsa')">📈 BORSA</div>
-    <div class="nav-item" onclick="showPanel('inv')">🎒 KOVA</div>
-    <div class="nav-item" onclick="showPanel('bank')">🏦 KASA</div>
-</div>
-
-<div id="p-borsa" class="panel">
-    <h2>📈 BORSA</h2>
-    <div id="borsa-list"></div>
-    <button onclick="showPanel('game')" class="buy-btn">KAPAT</button>
-</div>
-
-<div id="p-inv" class="panel">
-    <h2>🎒 KOVA</h2>
-    <div id="inv-list">Kovanız boş...</div>
-    <button onclick="showPanel('game')" class="buy-btn">KAPAT</button>
-</div>
-
-<div id="p-bank" class="panel">
-    <h2>🏦 KASA (100K TL HEDEF)</h2>
-    <h1 id="v-tl" style="color:var(--gold)">10.50 TL</h1>
-    <p>X puanına göre dağıtım yapılır.</p>
-    <button onclick="showPanel('game')" class="buy-btn">KAPAT</button>
-</div>
-
-<div id="fish-popup" onclick="this.style.display='none'">
-    <span id="f-icon" style="font-size: 80px;">🐟</span>
-    <h2 id="f-name">Balık!</h2>
-    <p id="f-reward" style="color:var(--neon)">+1 X-Point</p>
+    <div class="nav-item active">DENİZ</div>
+    <div class="nav-item">BORSA</div>
+    <div class="nav-item">FİLO</div>
+    <div class="nav-item">RANK</div>
+    <div class="nav-item">BANKA</div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp; tg.expand();
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let gold = 148, xpoints = 12, vaultTL = 10.50, time = 0, isFishing = false;
 
-    let player = { gold: 139, x: 0, lvl: 1, inv: {} };
-    let vault = { current: 10.50, target: 100000 };
-    const FISH_DATA = [
-        { name: "Sardalya", icon: "🐟", chance: 70, x: 1, price: 10 },
-        { name: "Levrek", icon: "🐠", chance: 20, x: 5, price: 50 },
-        { name: "Orkinos", icon: "🍱", chance: 8, x: 25, price: 150 },
-        { name: "Köpekbalığı", icon: "🦈", chance: 2, x: 100, price: 600 }
-    ];
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    // --- 3D SİSTEMİ ---
-    let scene, camera, renderer, water, boat, clock;
+    // --- 🎮 GERÇEKÇİ OKYANUS VE IŞIK MOTORU (THREE.JS) ---
+    let scene, camera, renderer, water, clock;
 
     function init3D() {
-        try {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 2000);
-            camera.position.set(0, 15, 50);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-            clock = new THREE.Clock();
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.position.set(0, 15, 50);
 
-            // Basit Su
-            const waterGeom = new THREE.PlaneGeometry(1000, 1000);
-            const waterMat = new THREE.MeshPhongMaterial({ color: 0x001e3c, shininess: 100 });
-            water = new THREE.Mesh(waterGeom, waterMat);
-            water.rotation.x = -Math.PI / 2;
-            scene.add(water);
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('render-container').appendChild(renderer.domElement);
 
-            const sun = new THREE.DirectionalLight(0xffffff, 1);
-            sun.position.set(10, 20, 10);
-            scene.add(sun);
-            scene.add(new THREE.AmbientLight(0x404040));
+        clock = new THREE.Clock();
 
-            // Basit Tekne
-            const boatGeom = new THREE.BoxGeometry(6, 2, 10);
-            const boatMat = new THREE.MeshPhongMaterial({ color: 0x0a0a0a });
-            boat = new THREE.Mesh(boatGeom, boatMat);
-            scene.add(boat);
+        // 🌊 GERÇEKÇİ SU MATERYALİ
+        const waterGeom = new THREE.PlaneGeometry(1000, 1000, 128, 128);
+        const waterMat = new THREE.MeshPhongMaterial({
+            color: 0x001a33,
+            shininess: 150,
+            specular: 0x00f2fe,
+            transparent: true,
+            opacity: 0.95
+        });
+        water = new THREE.Mesh(waterGeom, waterMat);
+        water.rotation.x = -Math.PI / 2;
+        scene.add(water);
 
-            animate();
-        } catch (e) { console.error("3D Hatası:", e); }
+        // ☀️ SİNEMATİK IŞIKLAR
+        const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+        sun.position.set(50, 100, 50);
+        scene.add(sun);
+        scene.add(new THREE.AmbientLight(0x404040, 0.6));
+
+        animate();
     }
 
     function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
-        if(boat) {
-            boat.position.y = Math.sin(t * 1.5) * 0.5;
-            boat.rotation.z = Math.sin(t) * 0.05;
+        
+        // Su Dalgalanma Simülasyonu
+        const pos = water.geometry.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            let x = pos.getX(i);
+            let y = pos.getY(i);
+            let z = Math.sin(x * 0.1 + t * 2) * 0.7 + Math.cos(y * 0.1 + t * 1.5) * 0.7;
+            pos.setZ(i, z);
         }
+        pos.needsUpdate = true;
+
         renderer.render(scene, camera);
+        draw2D(t);
     }
 
-    // --- OYNANIŞ ---
+    // --- 👨‍🌾 GERÇEKÇİ KARAKTER VE DETAY ÇİZİMİ ---
+    function draw2D(t) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const cx = canvas.width / 2;
+        const cy = canvas.height * 0.68 + Math.sin(t * 1.5) * 8; // Gemi sallanması
+
+        // 🚢 DETAYLI GEMİ
+        ctx.fillStyle = '#050a10';
+        ctx.beginPath();
+        ctx.moveTo(cx - 130, cy);
+        ctx.quadraticCurveTo(cx, cy + 25, cx + 130, cy);
+        ctx.lineTo(cx + 100, cy + 60);
+        ctx.lineTo(cx - 100, cy + 60);
+        ctx.fill();
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 🧔 GERÇEKÇİ BALIKÇI (Yüz Hatları ve Detaylar)
+        ctx.save();
+        ctx.translate(cx - 30, cy - 80);
+
+        // Kafa ve Yüz
+        ctx.fillStyle = '#f5cba7'; // Ten rengi
+        ctx.beginPath();
+        ctx.arc(15, 0, 18, 0, Math.PI * 2); // Kafa
+        ctx.fill();
+
+        // Gözler ve Sakal (Detaylar burada!)
+        ctx.fillStyle = '#2d1e12';
+        ctx.fillRect(8, -5, 4, 2); // Sol Göz
+        ctx.fillRect(18, -5, 4, 2); // Sağ Göz
+        ctx.beginPath();
+        ctx.arc(15, 10, 10, 0, Math.PI); // Sakal hattı
+        ctx.fill();
+
+        // Şapka (Kaptan Şapkası)
+        ctx.fillStyle = '#000';
+        ctx.fillRect(-5, -22, 40, 8); // Şapka kenarı
+        ctx.beginPath();
+        ctx.moveTo(0, -22); ctx.lineTo(30, -22); ctx.lineTo(15, -35); ctx.closePath();
+        ctx.fill();
+
+        // Gövde ve Kıyafet (Yağmurluk)
+        ctx.fillStyle = '#f1c40f'; // Sarı balıkçı yağmurluğu
+        ctx.beginPath();
+        ctx.roundRect(-10, 18, 50, 70, [15, 15, 0, 0]);
+        ctx.fill();
+        
+        ctx.restore();
+
+        // 🎣 OLTA VE MİSİNA (Dinamik)
+        ctx.strokeStyle = isFishing ? '#00f2fe' : '#333';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 40);
+        let rodAngle = isFishing ? 10 : -35;
+        let rodX = cx + Math.cos(rodAngle * Math.PI / 180) * 150;
+        let rodY = (cy - 40) + Math.sin(rodAngle * Math.PI / 180) * 150;
+        ctx.lineTo(rodX, rodY);
+        ctx.stroke();
+
+        if (isFishing) {
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(rodX, rodY);
+            ctx.lineTo(rodX + 20, canvas.height);
+            ctx.stroke();
+        }
+    }
+
     function handleCast() {
-        const btn = document.getElementById('castBtn');
-        btn.disabled = true; btn.innerText = "BEKLE...";
+        if(isFishing) return;
+        isFishing = true;
+        
         tg.HapticFeedback.impactOccurred('heavy');
+        const btn = document.getElementById('castBtn');
+        btn.disabled = true;
+        btn.innerText = "⚓ BEKLE...";
 
         setTimeout(() => {
-            let roll = Math.random() * 100;
-            let caught = FISH_DATA[0];
-            let acc = 0;
-            for(let f of FISH_DATA) {
-                acc += f.chance;
-                if(roll <= acc) { caught = f; break; }
-            }
-
-            player.inv[caught.name] = (player.inv[caught.name] || 0) + 1;
-            player.x += caught.x;
-            vault.current += 0.20;
-
-            document.getElementById('f-icon').innerText = caught.icon;
-            document.getElementById('f-name').innerText = caught.name;
-            document.getElementById('f-reward').innerText = `+${caught.x} X-Points`;
-            document.getElementById('fish-popup').style.display = 'block';
-
+            gold += 25; xpoints += 5; vaultTL += 0.85;
             updateUI();
             btn.disabled = false; btn.innerText = "OLTA AT";
+            isFishing = false;
             tg.HapticFeedback.notificationOccurred('success');
         }, 4000);
     }
 
     function updateUI() {
-        document.getElementById('g-v').innerText = Math.floor(player.gold);
-        document.getElementById('x-v').innerText = player.x;
-        document.getElementById('v-tl').innerText = vault.current.toFixed(2) + " TL";
-        let prog = (vault.current / vault.target) * 100;
+        document.getElementById('gold').innerText = Math.floor(gold);
+        document.getElementById('xpoints').innerText = xpoints;
+        let prog = (vaultTL / 100000) * 100;
         document.getElementById('v-fill').style.width = Math.min(prog, 100) + "%";
         document.getElementById('v-text').innerText = prog.toFixed(2) + "%";
-    }
-
-    function showPanel(id) {
-        document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-        if(id !== 'game') {
-            document.getElementById('p-' + id).style.display = 'block';
-            if(id === 'borsa') renderBorsa();
-            if(id === 'inv') renderInventory();
-        }
-    }
-
-    function renderBorsa() {
-        let html = "";
-        FISH_DATA.forEach(f => {
-            let price = Math.floor(f.price * (0.9 + Math.random() * 0.2));
-            html += `<div class="card">
-                <div>${f.icon} ${f.name} <br> Fiyat: ${price} 🪙</div>
-                <button onclick="sellFish('${f.name}', ${price})" class="buy-btn">SAT</button>
-            </div>`;
-        });
-        document.getElementById('borsa-list').innerHTML = html;
-    }
-
-    function renderInventory() {
-        let html = "";
-        for(let n in player.inv) {
-            if(player.inv[n] > 0) html += `<div class="card">${n}: ${player.inv[n]} adet</div>`;
-        }
-        document.getElementById('inv-list').innerHTML = html || "Kovanız boş.";
-    }
-
-    function sellFish(name, price) {
-        if(player.inv[name] > 0) {
-            player.inv[name]--;
-            let gain = Math.floor(price * 0.9); // %10 vergi
-            player.gold += gain;
-            updateUI();
-            renderBorsa();
-            tg.showPopup({ message: `${name} satıldı! %10 vergi kesildi.` });
-        }
     }
 
     window.onload = init3D;
