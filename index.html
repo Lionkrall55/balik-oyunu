@@ -3,313 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deep Sea: Realism & Conquest</title>
+    <title>Deep Sea Fishing - Production</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --neon-blue: #00f2fe;
-            --deep-ocean: #000b14;
-            --glass: rgba(0, 20, 40, 0.85);
+            --deep-ocean: #00040a;
+            --glass: rgba(0, 15, 30, 0.9);
             --gold: #ffd700;
-            --star-purple: #8a2be2;
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background: var(--deep-ocean); color: white; 
-            font-family: 'Inter', -apple-system, sans-serif;
+            overflow: hidden; background: #000; color: white; 
+            font-family: 'Segoe UI', sans-serif;
         }
 
+        /* Arka Plan Grafik Katmanı */
         #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 100%); z-index: 5; pointer-events: none; }
 
-        .ui-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; pointer-events: none; }
+        /* UI Katmanı - Tıklamaları geçirmesi için pointer-events:none */
+        .ui-container { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 10; display: flex; flex-direction: column; pointer-events: none; 
+        }
+
+        /* Tıklanabilir alanlar için pointer-events:auto */
         .interactive { pointer-events: auto; }
 
-        /* Modern Glass UI */
+        /* Üst Panel */
         .top-bar { 
-            background: var(--glass); padding: 15px; border-bottom: 1px solid rgba(0,242,254,0.3);
-            display: flex; justify-content: space-between; backdrop-filter: blur(15px);
+            background: var(--glass); padding: 15px; border-bottom: 2px solid var(--neon-blue);
+            display: flex; justify-content: space-around; backdrop-filter: blur(10px);
         }
+        .stat-box { text-align: center; }
+        .stat-val { display: block; font-size: 18px; font-weight: 900; color: var(--gold); }
+        .stat-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; }
 
-        .currency-box { display: flex; flex-direction: column; align-items: center; }
-        .currency-val { font-size: 18px; font-weight: 800; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .stars-val { color: var(--star-purple); text-shadow: 0 0 10px var(--star-purple); }
-
-        /* Merkez Aksiyon */
-        .action-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 100px; }
+        /* Orta Aksiyon Alanı */
+        .action-area { 
+            flex-grow: 1; display: flex; flex-direction: column; 
+            justify-content: flex-end; align-items: center; padding-bottom: 120px; 
+        }
         
-        .progress-container { width: 80%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
-        #progress-bar { width: 0%; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
-
-        .btn-cast {
+        .main-btn {
             background: linear-gradient(180deg, #00f2fe, #0061ff);
-            border: none; padding: 20px 60px; border-radius: 50px;
-            color: white; font-size: 20px; font-weight: 900; letter-spacing: 2px;
-            box-shadow: 0 15px 35px rgba(0, 97, 255, 0.5); cursor: pointer; transition: 0.3s;
+            border: none; padding: 18px 50px; border-radius: 50px;
+            color: white; font-size: 20px; font-weight: 900;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); cursor: pointer;
+            transition: transform 0.1s;
         }
+        .main-btn:active { transform: scale(0.9); }
+        .main-btn:disabled { background: #333; box-shadow: none; opacity: 0.5; }
 
-        /* Alt Menü */
+        /* Alt Navigasyon */
         .nav-bar { 
-            background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; 
-            padding: 15px 0 30px 0; border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; 
+            padding: 15px 0 35px 0; border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .nav-item { background: none; border: none; color: #666; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .nav-item.active { color: var(--neon-blue); }
+        .nav-item { background: none; border: none; color: #555; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
-        /* Gelişmiş Market Paneli */
-        .side-panel {
-            display: none; position: absolute; top: 0; right: 0; width: 100%; height: 100%;
-            background: var(--deep-ocean); z-index: 100; overflow-y: auto; padding: 20px; box-sizing: border-box;
+        /* Panel Pencereleri (Market, Filo vb.) */
+        .panel {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--deep-ocean); z-index: 100; padding: 25px; box-sizing: border-box;
+            overflow-y: auto;
         }
-        .market-section { margin-bottom: 30px; }
+        .panel-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid var(--neon-blue); margin-bottom: 20px; padding-bottom: 10px;
+        }
+        .close-btn { background: none; border: 1px solid white; color: white; padding: 5px 15px; border-radius: 5px; }
+        
         .market-card {
             background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .market-info h4 { margin: 0; color: var(--neon-blue); }
-        .market-info p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.7; }
-        .buy-btn { background: var(--neon-blue); color: black; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; }
-        .buy-btn.stars { background: var(--star-purple); color: white; }
-
+        .buy-btn { background: var(--neon-blue); color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
+<!-- Grafik Ekranı -->
 <canvas id="game-canvas"></canvas>
-<div class="overlay"></div>
 
+<!-- Oyun Arayüzü -->
 <div class="ui-container">
     <div class="top-bar interactive">
-        <div class="currency-box">
-            <span class="currency-val" id="gold-val">0</span>
-            <span class="stat-label">DEEP COIN</span>
-        </div>
-        <div class="currency-box">
-            <span class="currency-val stars-val" id="stars-val">0</span>
-            <span class="stat-label">STARS</span>
-        </div>
-        <div class="currency-box">
-            <span class="currency-val" id="level-val" style="color: #fff">1</span>
-            <span class="stat-label">LEVEL</span>
-        </div>
+        <div class="stat-box"><span id="gold-val" class="stat-val">0</span><span class="stat-label">DEEP COIN</span></div>
+        <div class="stat-box"><span id="stars-val" class="stat-val" style="color:#a855f7">0</span><span class="stat-label">STARS</span></div>
+        <div class="stat-box"><span id="level-val" class="stat-val" style="color:#fff">1</span><span class="stat-label">LEVEL</span></div>
     </div>
 
     <div class="action-area">
-        <div class="progress-container" id="p-container"><div id="progress-bar"></div></div>
-        <button id="cast-btn" class="btn-cast interactive" onclick="handleAction()">OLTA AT</button>
-        <p id="location-name" style="margin-top: 15px; font-size: 12px; color: var(--neon-blue); font-weight: bold;">📍 SIĞ KIYI ŞERİDİ</p>
+        <div id="status-text" style="color:white; margin-bottom:10px; font-weight:bold; font-size:14px; text-shadow: 0 2px 4px #000;">Okyanus hazır, kaptan!</div>
+        <button id="cast-btn" class="main-btn interactive" onclick="startFishing()">OLTA AT</button>
+        <p id="loc-text" style="margin-top:15px; color:var(--neon-blue); font-weight:bold; font-size:12px;">📍 SIĞ KIYI ŞERİDİ</p>
     </div>
 
     <div class="nav-bar interactive">
-        <button class="nav-item active" onclick="showPanel('game')">DENİZ</button>
-        <button class="nav-item" onclick="showPanel('shop')">MARKET</button>
-        <button class="nav-item" onclick="showPanel('ships')">FİLO</button>
-        <button class="nav-item" onclick="showPanel('ports')">LİMANLAR</button>
+        <button id="nav-game" class="nav-item active" onclick="showPanel('game')">DENİZ</button>
+        <button id="nav-market" class="nav-item" onclick="showPanel('market')">MARKET</button>
+        <button id="nav-fleet" class="nav-item" onclick="showPanel('fleet')">FİLO</button>
+        <button id="nav-ports" class="nav-item" onclick="showPanel('ports')">LİMANLAR</button>
     </div>
 </div>
 
-<!-- Market Paneli -->
-<div id="shop-panel" class="side-panel interactive">
-    <div style="display:flex; justify-content: space-between; align-items:center;">
-        <h2>🛒 MERKEZ MARKET</h2>
-        <button onclick="showPanel('game')" style="background:none; border:1px solid #fff; color:#fff; border-radius:50%; width:30px; height:30px;">X</button>
-    </div>
-    
-    <div class="market-section">
-        <h3>🎣 Oltalar (Hız Geliştirme)</h3>
-        <div id="rods-list"></div>
-    </div>
+<!-- Menü Panelleri -->
+<div id="panel-market" class="panel interactive">
+    <div class="panel-header"><h2>🛒 MARKET</h2> <button class="close-btn" onclick="showPanel('game')">GERİ</button></div>
+    <div class="market-card"><div><h4>Karbon Olta</h4><p>Hız: 5sn | Seviye: 1</p></div> <button class="buy-btn">1.000 🪙</button></div>
+    <div class="market-card"><div><h4>Siber Yem</h4><p>Nadir Balık Şansı +%20</p></div> <button class="buy-btn">500 🪙</button></div>
+</div>
 
-    <div class="market-section">
-        <h3>🛡️ Güvenlik ve Yardımcılar</h3>
-        <div class="market-card">
-            <div class="market-info"><h4>Port Kalkanı (24s)</h4><p>PvP saldırılarından %100 korur.</p></div>
-            <button class="buy-btn">500 🪙</button>
-        </div>
-    </div>
+<div id="panel-fleet" class="panel interactive">
+    <div class="panel-header"><h2>🚢 FİLOM</h2> <button class="close-btn" onclick="showPanel('game')">GERİ</button></div>
+    <div class="market-card"><div><h4>Demir Trol Gemi</h4><p>Kapasite: 100 Balık</p></div> <button class="buy-btn">5.000 🪙</button></div>
+    <div class="market-card"><div><h4>Abyss Explorer</h4><p>Derin Deniz Erişimi</p></div> <button class="buy-btn" style="background:#a855f7; color:white;">50 ⭐</button></div>
+</div>
+
+<div id="panel-ports" class="panel interactive">
+    <div class="panel-header"><h2>📍 LİMANLAR</h2> <button class="close-btn" onclick="showPanel('game')">GERİ</button></div>
+    <div class="market-card"><div><h4>Mavi Derinlik</h4><p>Gereksinim: Seviye 5</p></div> <button class="buy-btn">KİLİTLİ</button></div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    // OYUN VERİLERİ
-    let player = {
-        gold: 100, stars: 0, level: 1, xp: 0,
-        rodLevel: 1, 
-        ship: 'Sandal',
-        location: 'Kıyı',
-        shieldActive: false
-    };
-
-    const RODS = [
-        { name: "Eski Dal", speed: 10, cost: 0 },
-        { name: "Bambu Olta", speed: 8, cost: 500 },
-        { name: "Fiber Klasik", speed: 6, cost: 2500 },
-        { name: "Karbon Pro", speed: 4, cost: 10000 },
-        { name: "Cyber-Magnet", speed: 2, cost: 50000 },
-        { name: "Kuantum İp", speed: 1, cost: 250000 }
-    ];
-
-    const PORTS = [
-        { name: "Sığ Kıyı", multiplier: 1, minLevel: 1, cost: 0 },
-        { name: "Derin Çukur", multiplier: 3, minLevel: 10, cost: 5000 },
-        { name: "Antik Resif", multiplier: 10, minLevel: 25, cost: 50, type: 'stars' }
-    ];
-
-    // GRAFİK MOTORU (Realistic Water)
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
+    const tg = window.Telegram.WebApp;
+
+    let gold = 139;
     let waveTime = 0;
-
-    function render() {
-        ctx.clearRect(0,0, canvas.width, canvas.height);
-        waveTime += 0.015;
-
-        // Arka Plan (Deep Sea Gradient)
-        let bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        bg.addColorStop(0, '#001a2e');
-        bg.addColorStop(1, '#00040a');
-        ctx.fillStyle = bg;
-        ctx.fillRect(0,0, canvas.width, canvas.height);
-
-        // Katmanlı Gerçekçi Dalgalar
-        drawWave(0.5, 0.01, 15, "rgba(0, 242, 254, 0.05)");
-        drawWave(0.8, 0.02, 10, "rgba(0, 150, 255, 0.1)");
-        drawWave(0.3, 0.015, 20, "rgba(0, 10, 20, 0.8)");
-
-        requestAnimationFrame(render);
-    }
-
-    function drawWave(speedMult, freq, amp, color) {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        let yBase = canvas.height * 0.7;
-        ctx.moveTo(0, yBase);
-        for(let i=0; i<=canvas.width; i+=10) {
-            let y = yBase + Math.sin(waveTime * speedMult + i * freq) * amp;
-            ctx.lineTo(i, y);
-        }
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.fill();
-    }
-
-    // OYNANIŞ MANTIĞI
     let isFishing = false;
 
-    function handleAction() {
-        if(isFishing) return;
-        
-        isFishing = true;
-        const currentRod = RODS[player.rodLevel - 1];
-        const castBtn = document.getElementById('cast-btn');
-        const pBar = document.getElementById('progress-bar');
-        const pContainer = document.getElementById('p-container');
-
-        castBtn.disabled = true;
-        pContainer.style.display = 'block';
-        
-        let duration = currentRod.speed * 1000;
-        let start = null;
-
-        function animateProgress(timestamp) {
-            if (!start) start = timestamp;
-            let progress = timestamp - start;
-            let percent = Math.min((progress / duration) * 100, 100);
-            pBar.style.width = percent + "%";
-
-            if (progress < duration) {
-                requestAnimationFrame(animateProgress);
-            } else {
-                finishFishing();
-            }
-        }
-        requestAnimationFrame(animateProgress);
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-
-    function finishFishing() {
-        isFishing = false;
-        document.getElementById('cast-btn').disabled = false;
-        document.getElementById('p-container').style.display = 'none';
-        document.getElementById('progress-bar').style.width = "0%";
-
-        // Kazanç Hesaplama (Liman çarpanı ve seviye etkisi)
-        let gain = Math.floor(Math.random() * 20) + 10;
-        player.gold += gain;
-        player.xp += 15;
-        
-        // Seviye Atlama
-        if(player.xp >= player.level * 100) {
-            player.level++;
-            player.xp = 0;
-            tg.showPopup({ title: 'SEVİYE ATLADIN!', message: `Artık Seviye ${player.level} balıkçısısın!` });
-        }
-
-        updateUI();
-        tg.HapticFeedback.notificationOccurred('success');
-    }
-
-    function updateUI() {
-        document.getElementById('gold-val').innerText = player.gold;
-        document.getElementById('stars-val').innerText = player.stars;
-        document.getElementById('level-val').innerText = player.level;
-    }
-
-    // MARKET SİSTEMİ
-    function showPanel(panel) {
-        document.querySelectorAll('.side-panel').forEach(p => p.style.display = 'none');
-        if(panel === 'shop') {
-            document.getElementById('shop-panel').style.display = 'block';
-            renderRodMarket();
-        }
-    }
-
-    function renderRodMarket() {
-        let html = "";
-        RODS.forEach((rod, index) => {
-            let isOwned = player.rodLevel > index;
-            let isNext = player.rodLevel === index;
-            html += `
-                <div class="market-card">
-                    <div class="market-info">
-                        <h4>${rod.name}</h4>
-                        <p>Hız: ${rod.speed}sn</p>
-                    </div>
-                    <button class="buy-btn" ${isOwned || !isNext ? 'disabled' : ''} onclick="buyRod(${index})">
-                        ${isOwned ? 'SAHİPSİN' : rod.cost + ' 🪙'}
-                    </button>
-                </div>
-            `;
-        });
-        document.getElementById('rods-list').innerHTML = html;
-    }
-
-    function buyRod(index) {
-        let rod = RODS[index];
-        if(player.gold >= rod.cost) {
-            player.gold -= rod.cost;
-            player.rodLevel = index + 1;
-            updateUI();
-            renderRodMarket();
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-    }
-
-    // BAŞLAT
-    window.onload = () => {
-        resize();
-        render();
-        updateUI();
-    };
-
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-</script>
-</body>
-</html>
+    // Balıkçı Silueti
+    const fishermanImg = new Image();
